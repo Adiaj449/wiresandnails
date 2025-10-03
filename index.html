@@ -3,96 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shree Wire & Nails | HB Wire, MS Wire, MS Nails</title>
+  <title>Shree JMT's Wires & Nails | HB Wire, MS Wire, MS Nails</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: #fdfdfd;
+      background: #f8f9fa;
       color: #222;
     }
     header {
-      background: #ffcc00;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 4px solid #000;
+      background: #ffffff;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #eee;
+    }
+    header img {
+      height: 70px;
     }
     header h1 {
       margin: 0;
-      font-size: 2.5rem;
-      color: #000;
-    }
-    header p {
-      margin: 5px 0;
-      font-weight: bold;
+      font-size: 1.8rem;
       color: #333;
     }
-    .hero {
-      background: url("images/flyer.jpg") no-repeat center/cover;
-      height: 60vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: white;
-      position: relative;
+    header p {
+      margin: 2px 0 0;
+      font-size: 0.95rem;
+      color: #555;
     }
-    .hero::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
+    .hero {
+      background: linear-gradient(135deg, #ffffff, #f1f1f1);
+      padding: 80px 20px;
+      text-align: center;
     }
     .hero h2 {
       font-size: 2.5rem;
-      z-index: 1;
-      position: relative;
+      color: #222;
+      margin-bottom: 15px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #555;
     }
     .products {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       padding: 40px;
+      background: #fff;
     }
     .product {
-      background: #fff;
-      border: 2px solid #eee;
+      background: #fdfdfd;
+      border: 1px solid #ddd;
       border-radius: 12px;
       text-align: center;
       padding: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .product:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transform: translateY(-6px);
+      box-shadow: 0 8px 14px rgba(0,0,0,0.15);
     }
     .product img {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 8px;
       height: 200px;
       object-fit: cover;
+      margin-bottom: 15px;
+    }
+    .product h3 {
+      color: #d32f2f;
+      margin-bottom: 10px;
     }
     .quality {
       padding: 40px;
-      background: #000;
-      color: #fff;
+      background: #f8f9fa;
       text-align: center;
     }
     .quality h2 {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      color: #222;
     }
     .about, .contact {
       padding: 40px;
       text-align: center;
+      background: #fff;
     }
     .contact form {
       max-width: 500px;
       margin: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     input, textarea, button {
       padding: 12px;
@@ -101,10 +106,15 @@
       font-size: 1rem;
     }
     button {
-      background: #ffcc00;
+      background: #d32f2f;
+      color: #fff;
       border: none;
       cursor: pointer;
       font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #a71d2a;
     }
     footer {
       background: #111;
@@ -118,19 +128,23 @@
 <body>
 
   <header>
-    <h1>Shree Wire & Nails</h1>
-    <p>HB Wire | MS Wire | MS Nails</p>
+    <img src="images/wiresandnailslogo.png" alt="Shree JMT's Wires & Nails Logo">
+    <div>
+      <h1>Shree JMT's Wires & Nails</h1>
+      <p>HB Wire | MS Wire | MS Nails</p>
+    </div>
   </header>
 
   <section class="hero">
     <h2>Superior Export Quality • Made in India</h2>
+    <p>Trusted No.1 Brand for Wires & Nails Manufacturing</p>
   </section>
 
   <section class="products">
     <div class="product">
       <img src="images/hb-wire.jpg" alt="HB Wire">
       <h3>HB Wire</h3>
-      <p>Durable, strong, and reliable HB Wire for industrial & construction use.</p>
+      <p>Durable and strong HB Wire for industrial & construction use.</p>
     </div>
     <div class="product">
       <img src="images/ms-wire.jpg" alt="MS Wire">
@@ -152,7 +166,7 @@
 
   <section class="about">
     <h2>About Us</h2>
-    <p>Shree Wire & Nails (JMT’s) is a leading manufacturer of HB Wire, MS Wire, and MS Nails. With a focus on quality and innovation, we deliver products trusted by industries worldwide.</p>
+    <p>Shree JMT’s Wires & Nails is a leading manufacturer of HB Wire, MS Wire, and MS Nails. With a focus on quality and innovation, we deliver products trusted by industries worldwide.</p>
   </section>
 
   <section class="contact">
@@ -167,7 +181,7 @@
   </section>
 
   <footer>
-    <p>© 2025 Shree Wire & Nails | All Rights Reserved</p>
+    <p>© 2025 Shree JMT's Wires & Nails | All Rights Reserved</p>
   </footer>
 
 </body>
