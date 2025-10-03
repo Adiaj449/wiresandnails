@@ -22,67 +22,65 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     .text-center { text-align: center; }
 
-    /* Header */
+    /* Header - Cleaned up */
     header {
       display: flex; justify-content: space-between;
       align-items: center;
       padding: 10px 30px; 
       background: #fff; 
-      border-bottom: 4px solid #d32f2f;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border-bottom: 3px solid #d32f2f; /* Thinner border */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Lighter shadow */
       position: sticky; top: 0; z-index: 1000;
       transition: all 0.3s ease;
     }
-    header .logo-container { display: flex; align-items: center; }
-    header img { height: 50px; margin-right: 15px; } 
+    header .logo-container { 
+        display: flex; 
+        align-items: center; 
+        flex-shrink: 0; /* Prevents logo from shrinking */
+    }
+    header img { 
+        height: 50px; 
+        margin-right: 15px; 
+    } 
     
-    /* Custom Image/Banner Replacement Style */
-    header .brand-banner {
-        flex-grow: 1; 
-        background-color: #ffd700; /* Striking Yellow Background */
-        color: #000;
-        padding: 5px 15px;
-        border-radius: 5px;
-        text-align: center;
-        max-width: 650px; 
-        margin-left: 20px;
-        font-weight: 700;
-        border: 2px solid #000; /* Subtle border for definition */
+    /* Simplified Brand Information */
+    header .brand-info {
+        flex-grow: 1; /* Allows brand info to take central space */
+        text-align: left;
+        padding-left: 20px;
     }
-    header .brand-banner .slogan {
-        font-size: 0.9rem;
-        color: #d32f2f; /* Red color for the Hindi slogan */
-        margin-bottom: 5px;
+    header .brand-info .main-title {
+        font-size: 1.8rem;
         font-weight: 900;
-    }
-    header .brand-banner .title {
-        font-size: 2rem;
-        font-weight: 900;
+        color: #333; /* Default dark color */
         line-height: 1.1;
-        margin-bottom: 5px;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
     }
-    header .brand-banner .products-list {
-        font-size: 1.1rem;
+    header .brand-info .products-list {
+        font-size: 1rem;
         font-weight: 700;
-        white-space: nowrap;
-        padding-bottom: 5px;
+        color: #d32f2f; /* Red for product focus */
+        margin-top: 2px;
     }
-    header .brand-banner .vernacular-names {
-        display: flex;
-        justify-content: space-around;
+    header .brand-info .slogan-vernacular {
         font-size: 0.8rem;
         font-weight: 500;
-        margin-top: -3px; /* Pull closer to product list */
-        padding-bottom: 5px;
+        color: #555;
+        margin-top: 2px;
     }
+
+    /* Contact Phone */
     header .contact-phone {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 900;
         color: #d32f2f; 
-        margin-left: 20px;
+        margin-left: 30px;
         white-space: nowrap;
+        flex-shrink: 0;
+    }
+    header .contact-phone a {
+        color: #d32f2f;
     }
 
     /* Hero Section with Video Background */
@@ -167,9 +165,6 @@
       opacity: 0; transform: translateY(30px);
     }
     .product.show { opacity: 1; transform: translateY(0); }
-    .product:nth-child(1) { transition-delay: 0.1s; }
-    .product:nth-child(2) { transition-delay: 0.2s; }
-    .product:nth-child(3) { transition-delay: 0.3s; }
     .product:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
     
     .product-icon { color: #d32f2f; font-size: 3rem; margin-bottom: 15px; } 
@@ -199,39 +194,25 @@
     /* Contact Section */
     .contact { background: #fff; }
     .contact form { max-width: 600px; margin: auto; display: flex; flex-direction: column; gap: 18px; }
-    input, textarea, button {
-      padding: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
-      transition: all 0.3s ease;
-    }
     input:focus, textarea:focus { border-color: #d32f2f; outline: none; box-shadow: 0 0 10px rgba(211,47,47,0.2); }
     button {
       background: #d32f2f; color: #fff; border: none; cursor: pointer; font-weight: bold;
     }
     button:hover { background: #a71d2a; }
-    .contact p { margin-top: 30px; font-size: 1.1rem; font-weight: 500; }
-
-    /* Footer */
-    footer { background: #111; color: #ccc; text-align: center; padding: 30px; font-size: 0.9rem; }
-    footer a { color: #ffd700; }
 
     /* Simple Icon Font Simulation for Products */
     .product-icon.hb-wire::before { content: '🔗'; }
     .product-icon.ms-wire::before { content: '🧶'; }
     .product-icon.ms-nails::before { content: '🔨'; }
 
-    /* Animation */
-    @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
-
     /* Responsive */
     @media (max-width: 768px) {
-      header { flex-direction: column; align-items: center; gap: 10px; padding: 15px 20px; }
+      header { flex-direction: column; align-items: center; gap: 5px; padding: 15px 20px; }
       header .logo-container { margin-bottom: 5px; }
-      header .brand-banner { max-width: 100%; margin: 10px 0; padding: 8px 10px; }
-      header .brand-banner .title { font-size: 1.6rem; }
-      header .brand-banner .products-list { font-size: 0.9rem; }
-      header .brand-banner .vernacular-names { font-size: 0.7rem; }
-      header .contact-phone { margin-left: 0; margin-top: 5px; }
-      .hero h2 { font-size: 2.2rem; }
+      header .brand-info { padding-left: 0; text-align: center; }
+      header .brand-info .main-title { font-size: 1.5rem; }
+      header .brand-info .products-list { font-size: 0.9rem; }
+      header .contact-phone { margin: 10px 0 0; }
     }
   </style>
 </head>
@@ -242,16 +223,11 @@
       <img src="/Images/logo_wires.jpg" alt="Shree JMT's Logo"> 
     </div>
     
-    <div class="brand-banner">
-        <div class="slogan">साथ... सहयोग... सहभाग...!</div>
-        <div class="title">WIRE & NAIL</div>
+    <div class="brand-info">
+        <div class="slogan-vernacular">साथ... सहयोग... सहभाग...!</div>
+        <div class="main-title">WIRE & NAIL</div>
         <div class="products-list">
-            HB Wire | MS Wire | MS Nails
-        </div>
-        <div class="vernacular-names">
-            <span>(एचबी वायर)</span>
-            <span>(बाँधी तार)</span>
-            <span>(खीले)</span>
+            HB Wire | MS Wire | MS Nails (एचबी वायर | बाँधी तार | खीले)
         </div>
     </div>
     
