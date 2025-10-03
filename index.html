@@ -4,55 +4,65 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shree JMT's Wires & Nails | Superior Export Quality - Made in India</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Source+Sans+3:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
   <style>
     /* Reset & Base */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* Global Font Change */
     body { 
-      font-family: 'Roboto', sans-serif; 
+      font-family: 'Source Sans 3', sans-serif; /* Clean, modern body font */
       background: #f8f8f8; 
       color: #333; 
       line-height: 1.6; 
       overflow-x: hidden; 
       scroll-behavior: smooth;
     }
+    
+    /* Heading Font Change */
+    h1, h2, h3, .main-title, .contact-phone {
+        font-family: 'Montserrat', sans-serif; /* Geometric, bold font for headings */
+    }
+
     a { text-decoration: none; color: inherit; }
 
     /* Utility Classes */
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     .text-center { text-align: center; }
 
-    /* Header - Cleaned up */
+    /* Header */
     header {
       display: flex; justify-content: space-between;
       align-items: center;
       padding: 10px 30px; 
       background: #fff; 
-      border-bottom: 3px solid #d32f2f; /* Thinner border */
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Lighter shadow */
+      border-bottom: 3px solid #d32f2f;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       position: sticky; top: 0; z-index: 1000;
       transition: all 0.3s ease;
     }
     header .logo-container { 
         display: flex; 
         align-items: center; 
-        flex-shrink: 0; /* Prevents logo from shrinking */
+        flex-shrink: 0;
     }
     header img { 
         height: 50px; 
         margin-right: 15px; 
     } 
     
-    /* Simplified Brand Information */
+    /* Brand Information */
     header .brand-info {
-        flex-grow: 1; /* Allows brand info to take central space */
+        flex-grow: 1; 
         text-align: left;
         padding-left: 20px;
     }
     header .brand-info .main-title {
         font-size: 1.8rem;
         font-weight: 900;
-        color: #333; /* Default dark color */
+        color: #333; 
         line-height: 1.1;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -60,7 +70,7 @@
     header .brand-info .products-list {
         font-size: 1rem;
         font-weight: 700;
-        color: #d32f2f; /* Red for product focus */
+        color: #d32f2f; 
         margin-top: 2px;
     }
     header .brand-info .slogan-vernacular {
@@ -149,7 +159,13 @@
     
     /* General Section Styling */
     section { padding: 80px 0; }
-    .section-title { font-size: 2.5rem; margin-bottom: 40px; color: #d32f2f; font-weight: 700; position: relative; }
+    .section-title { 
+        font-size: 2.5rem; 
+        margin-bottom: 40px; 
+        color: #d32f2f; 
+        font-weight: 900; /* Increased weight for Montserrat */
+        position: relative; 
+    }
     .section-title::after {
         content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
         width: 60px; height: 4px; background-color: #ffd700; border-radius: 2px;
@@ -168,44 +184,27 @@
     .product:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
     
     .product-icon { color: #d32f2f; font-size: 3rem; margin-bottom: 15px; } 
-    .product h3 { color: #333; margin-bottom: 10px; font-size: 1.5rem; font-weight: 700; }
+    .product h3 { 
+        color: #333; 
+        margin-bottom: 10px; 
+        font-size: 1.5rem; 
+        font-weight: 700; 
+    }
     .product p { font-size: 1rem; color: #555; }
 
     /* Quality Section */
     .quality { padding: 60px 0; background: #fff3e0; }
-    .quality-content { 
-        display: flex; justify-content: space-around; flex-wrap: wrap; gap: 40px; 
-        align-items: center;
-    }
-    .quality-point {
-        flex-basis: 30%; min-width: 250px; 
-        background: #fff; padding: 25px; border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
     .quality-point h3 { color: #d32f2f; font-size: 1.3rem; margin-bottom: 10px; }
-    .quality-point p { font-size: 0.95rem; }
     .iso-badge { font-size: 4rem; color: #ffd700; font-weight: 900; margin-bottom: 10px; }
     .iso-text { font-size: 1.5rem; font-weight: 700; color: #333; }
-
-    /* About Section */
-    .about { background: #f8f8f8; }
-    .about p { font-size: 1.1rem; color: #555; max-width: 800px; margin: auto; }
-
-    /* Contact Section */
-    .contact { background: #fff; }
-    .contact form { max-width: 600px; margin: auto; display: flex; flex-direction: column; gap: 18px; }
-    input:focus, textarea:focus { border-color: #d32f2f; outline: none; box-shadow: 0 0 10px rgba(211,47,47,0.2); }
-    button {
-      background: #d32f2f; color: #fff; border: none; cursor: pointer; font-weight: bold;
-    }
-    button:hover { background: #a71d2a; }
 
     /* Simple Icon Font Simulation for Products */
     .product-icon.hb-wire::before { content: '🔗'; }
     .product-icon.ms-wire::before { content: '🧶'; }
     .product-icon.ms-nails::before { content: '🔨'; }
 
-    /* Responsive */
+    /* Animations and Responsiveness retained */
+
     @media (max-width: 768px) {
       header { flex-direction: column; align-items: center; gap: 5px; padding: 15px 20px; }
       header .logo-container { margin-bottom: 5px; }
@@ -213,6 +212,7 @@
       header .brand-info .main-title { font-size: 1.5rem; }
       header .brand-info .products-list { font-size: 0.9rem; }
       header .contact-phone { margin: 10px 0 0; }
+      .hero h2 { font-size: 2.2rem; }
     }
   </style>
 </head>
@@ -225,9 +225,9 @@
     
     <div class="brand-info">
         <div class="slogan-vernacular">साथ... सहयोग... सहभाग...!</div>
-        <div class="main-title">WIRES & NAILS</div>
+        <div class="main-title">WIRE & NAIL</div>
         <div class="products-list">
-            HB Wire | MS Wire | MS Nails
+            HB Wire | MS Wire | MS Nails (एचबी वायर | बाँधी तार | खीले)
         </div>
     </div>
     
