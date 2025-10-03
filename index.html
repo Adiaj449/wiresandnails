@@ -48,8 +48,10 @@
         align-items: center; 
         flex-shrink: 0;
     }
+    
+    /* LOGO SIZE INCREASED HERE */
     header img { 
-        height: 50px; 
+        height: 80px; /* Increased from 50px */
         margin-right: 15px; 
     } 
     
@@ -163,7 +165,7 @@
         font-size: 2.5rem; 
         margin-bottom: 40px; 
         color: #d32f2f; 
-        font-weight: 900; /* Increased weight for Montserrat */
+        font-weight: 900; 
         position: relative; 
     }
     .section-title::after {
@@ -208,6 +210,8 @@
     @media (max-width: 768px) {
       header { flex-direction: column; align-items: center; gap: 5px; padding: 15px 20px; }
       header .logo-container { margin-bottom: 5px; }
+      /* Adjust logo size down for mobile screens */
+      header img { height: 60px; } 
       header .brand-info { padding-left: 0; text-align: center; }
       header .brand-info .main-title { font-size: 1.5rem; }
       header .brand-info .products-list { font-size: 0.9rem; }
@@ -225,9 +229,9 @@
     
     <div class="brand-info">
         <div class="slogan-vernacular">साथ... सहयोग... सहभाग...!</div>
-        <div class="main-title">WIRE & NAIL</div>
+        <div class="main-title">WIRES & NAILS</div>
         <div class="products-list">
-            HB Wire | MS Wire | MS Nails (एचबी वायर | बाँधी तार | खीले)
+            HB Wire | MS Wire | MS Nails
         </div>
     </div>
     
