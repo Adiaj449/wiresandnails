@@ -16,17 +16,48 @@
       display: flex; justify-content: space-between; align-items: center;
       padding: 15px 30px; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.05);
       position: sticky; top: 0; z-index: 1000; flex-wrap: wrap;
-      transition: all 0.3s ease;
     }
     header img { height: 60px; }
-    header .brand { text-align: right; }
-    header h1 { font-size: 1.6rem; color: #d32f2f; }
-    header p { color: #555; font-size: 0.85rem; }
+    .brand h1 { font-size: 1.6rem; color: #d32f2f; }
+    .brand p { color: #555; font-size: 0.85rem; }
+
+    /* Navigation */
+    nav { display: flex; align-items: center; gap: 25px; }
+    nav ul { display: flex; list-style: none; gap: 25px; }
+    nav ul li { position: relative; }
+    nav ul li a { font-weight: 500; color: #333; padding: 6px 0; transition: color 0.3s; }
+    nav ul li a:hover { color: #d32f2f; }
+
+    /* Dropdown */
+    nav ul li ul {
+      display: none;
+      position: absolute;
+      top: 35px; left: 0;
+      background: #fff; border: 1px solid #ddd; border-radius: 8px;
+      min-width: 180px; box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    nav ul li:hover ul { display: block; }
+    nav ul li ul li { padding: 10px 15px; }
+    nav ul li ul li a { color: #333; }
+    nav ul li ul li a:hover { color: #d32f2f; }
+
+    /* Hamburger menu for mobile */
+    .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+    .hamburger div { width: 25px; height: 3px; background: #333; transition: 0.3s; }
+
+    @media (max-width: 768px) {
+      nav ul { flex-direction: column; gap: 0; position: absolute; top: 70px; left: -100%; background: #fff; width: 100%; transition: left 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+      nav ul.show { left: 0; }
+      nav ul li { padding: 12px 20px; }
+      nav ul li ul { position: relative; top: 0; border: none; box-shadow: none; }
+      .hamburger { display: flex; }
+    }
 
     /* Hero Section */
     .hero {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 90vh; background: url('/Images/wiresandnails.png') center/cover no-repeat;
+      height: 90vh; background: url('/mnt/data/9dc67880-a3b1-4a3f-b322-fbdc65433848.png') center/cover no-repeat;
       text-align: center; color: #fff; position: relative;
     }
     .hero::after {
@@ -50,19 +81,14 @@
     .product h3 { color: #d32f2f; margin-bottom: 10px; font-size: 1.2rem; }
     .product p { font-size: 0.95rem; color: #555; }
 
-    /* Quality Section */
-    .quality { padding: 60px 20px; text-align: center; background: #fff8e1; }
-    .quality h2 { font-size: 2rem; margin-bottom: 15px; color: #d32f2f; }
-    .quality p { font-size: 1rem; color: #555; margin-bottom: 5px; }
+    /* Sections */
+    .quality, .about, .contact { padding: 60px 20px; text-align: center; }
+    .quality, .contact { background: #fff8e1; }
+    .quality h2, .about h2, .contact h2 { font-size: 2rem; margin-bottom: 15px; color: #d32f2f; }
+    .quality p, .about p, .contact p { font-size: 1rem; color: #555; margin-bottom: 5px; }
 
-    /* About Section */
-    .about { padding: 60px 20px; text-align: center; background: #fff; }
-    .about h2 { font-size: 2rem; margin-bottom: 15px; color: #d32f2f; }
-    .about p { font-size: 1rem; color: #555; max-width: 700px; margin: auto; }
+    .about p { max-width: 700px; margin: auto; }
 
-    /* Contact Section */
-    .contact { padding: 60px 20px; text-align: center; background: #fff8e1; }
-    .contact h2 { font-size: 2rem; margin-bottom: 20px; color: #d32f2f; }
     .contact form { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 15px; }
     input, textarea, button {
       padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
@@ -75,7 +101,15 @@
     button:hover { background: #a71d2a; }
 
     /* Footer */
-    footer { background: #111; color: #fff; text-align: center; padding: 20px; }
+    footer {
+      background: #1a1a1a; color: #fff; padding: 40px 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+      font-size: 0.95rem;
+    }
+    footer .footer-brand { font-weight: bold; font-size: 1.2rem; color: #d32f2f; }
+    footer .footer-links ul { list-style: none; display: flex; gap: 15px; flex-wrap: wrap; }
+    footer .footer-links ul li a { color: #fff; transition: 0.3s; }
+    footer .footer-links ul li a:hover { color: #d32f2f; }
+    footer p { margin-top: 10px; width: 100%; text-align: center; color: #ccc; }
 
     /* Animations */
     @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -83,14 +117,13 @@
     /* Responsive */
     @media (max-width: 768px) {
       header { flex-direction: column; align-items: flex-start; gap: 10px; }
-      header .brand { text-align: left; }
+      nav ul { flex-direction: column; }
       .hero h2 { font-size: 2rem; }
       .hero p { font-size: 1rem; }
       .products { grid-template-columns: 1fr; padding: 40px 10px; }
       .product img { height: 200px; }
       .quality h2, .about h2, .contact h2 { font-size: 1.6rem; }
     }
-
     @media (max-width: 480px) {
       header img { height: 50px; }
       .hero { height: 70vh; padding: 40px 15px; }
@@ -109,9 +142,30 @@
       <h1>Shree JMT's Wires & Nails</h1>
       <p>HB Wire | MS Wire | MS Nails</p>
     </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <nav>
+      <ul id="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li>
+          <a href="#">Products ▾</a>
+          <ul>
+            <li><a href="#hb-wire">HB Wire</a></li>
+            <li><a href="#ms-wire">MS Wire</a></li>
+            <li><a href="#ms-wire-nails">MS Wire Nails</a></li>
+          </ul>
+        </li>
+        <li><a href="#quality">Quality</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <section class="hero">
+  <section class="hero" id="hero">
     <div class="hero-content">
       <h2>Superior Export Quality • Made in India</h2>
       <p>Trusted No.1 Brand for Wires & Nails Manufacturing</p>
@@ -119,35 +173,35 @@
   </section>
 
   <section class="products">
-    <div class="product">
+    <div class="product" id="hb-wire">
       <img src="images/hb-wire.jpg" alt="HB Wire">
       <h3>HB Wire</h3>
       <p>Durable and strong HB Wire for industrial & construction use.</p>
     </div>
-    <div class="product">
+    <div class="product" id="ms-wire">
       <img src="images/ms-wire.jpg" alt="MS Wire">
       <h3>MS Wire</h3>
       <p>High-quality MS Wire with precise gauge and superior finish.</p>
     </div>
-    <div class="product">
+    <div class="product" id="ms-wire-nails">
       <img src="images/ms-wire-nails.jpg" alt="MS Wire Nails">
       <h3>MS Wire Nails</h3>
       <p>Sharp diamond point, long head, polished finish – trusted #1 brand.</p>
     </div>
   </section>
 
-  <section class="quality">
+  <section class="quality" id="quality">
     <h2>ISO 9001:2015 Certified</h2>
     <p>We are committed to world-class quality standards with precision manufacturing in Jalna, Maharashtra.</p>
     <p><b>No.1 Trusted Brand – Superior Export Quality</b></p>
   </section>
 
-  <section class="about">
+  <section class="about" id="about">
     <h2>About Us</h2>
     <p>Shree JMT’s Wires & Nails is a leading manufacturer of HB Wire, MS Wire, and MS Nails. With a focus on quality and innovation, we deliver products trusted by industries worldwide.</p>
   </section>
 
-  <section class="contact">
+  <section class="contact" id="contact">
     <h2>Contact Us</h2>
     <form>
       <input type="text" placeholder="Your Name" required>
@@ -159,6 +213,16 @@
   </section>
 
   <footer>
+    <div class="footer-brand">Shree JMT's Wires & Nails</div>
+    <div class="footer-links">
+      <ul>
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#quality">Quality</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
     <p>© 2025 Shree JMT's Wires & Nails | All Rights Reserved</p>
   </footer>
 
@@ -175,6 +239,11 @@
       });
     }, options);
     products.forEach(product => observer.observe(product));
+
+    // Hamburger toggle
+    function toggleMenu() {
+      document.getElementById('nav-links').classList.toggle('show');
+    }
   </script>
 
 </body>
