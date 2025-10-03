@@ -3,225 +3,110 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wires & Nail — Quality Wires · Durable Nails</title>
-  <meta name="description" content="Wires and Nail — Manufacturer and supplier of high-quality wires and nails. Fast delivery across India. Contact us for bulk orders and custom specifications." />
-  <meta name="keywords" content="wires, nails, industrial nails, wire supplier, wire manufacturer, nails supplier, shree wires and nails" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Wires & Nail — Quality Wires · Durable Nails" />
-  <meta property="og:description" content="Manufacturer and supplier of high-quality wires and nails. Contact for bulk orders and custom specifications." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://wiresandnail.com" />
-  <meta property="og:image" content="/assets/og-image.jpg" />
-
-  <!-- Structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Wires & Nail",
-    "url": "https://wiresandnail.com",
-    "logo": "https://wiresandnail.com/assets/logo.png",
-    "description": "Manufacturer and supplier of high-quality wires and nails.",
-    "contactPoint": [{"@type": "ContactPoint","telephone": "+91-XXXXXXXXXX","contactType": "sales","areaServed": "IN"}]
-  }
-  </script>
+  <title>Wires & Nail — HB Wire · MS Wire · MS Nails</title>
+  <meta name="description" content="Shree Wires & Nail — Manufacturer and supplier of HB Wire, MS Wire, and MS Wire Nails. Superior export quality. ISO 9001:2015 Certified. Made in India." />
+  <meta name="keywords" content="wires, nails, HB wire, MS wire, MS nails, wire nails, Jalna, Shree Wires and Nails, ISO certified" />
 
   <style>
-    :root{
-      --accent:#0077b6;
-      --muted:#6b7280;
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --radius:14px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    :root {
+      --primary: #ffcc00;
+      --black: #111;
+      --white: #fff;
+      --accent: #d00000;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:#0f172a;line-height:1.45}
-    .container{max-width:1100px;margin:0 auto;padding:28px}
-
-    header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#00b4d8);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}
-    nav a{margin-left:16px;text-decoration:none;color:var(--muted);font-weight:600}
-
-    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:20px}
-    .hero-card{background:var(--card);padding:28px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(12,16,20,0.06)}
-    h1{font-size:32px;margin:0 0 10px}
-    p.lead{color:var(--muted);margin:0 0 18px}
-    .cta-row{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{background:var(--accent);color:white;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700}
-    .btn.ghost{background:transparent;border:2px solid #e6edf3;color:var(--accent)}
-
-    .features{display:flex;gap:12px;margin-top:18px}
-    .feature{flex:1;background:linear-gradient(180deg,#fff, #fbfdff);padding:12px;border-radius:10px;border:1px solid #eef4f9}
-    .feature h4{margin:0 0 6px}
-    .product-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
-    .product{background:var(--card);padding:14px;border-radius:12px;text-align:center;border:1px solid #eef4f9}
-    .product img{width:100%;height:140px;object-fit:cover;border-radius:8px}
-    .product h5{margin:10px 0 6px}
-    .muted{color:var(--muted);font-size:14px}
-
-    footer{margin-top:40px;padding:20px 0;color:var(--muted);font-size:14px;border-top:1px solid #eef4f9}
-
-    /* Responsive */
-    @media (max-width:900px){
-      .hero{grid-template-columns:1fr}
-      .product-list{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:520px){
-      .product-list{grid-template-columns:1fr}
-      nav a{display:none}
-      .logo{width:44px;height:44px}
-      h1{font-size:24px}
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--white); color:var(--black); line-height:1.6; }
+    header { background:var(--primary); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:20px; }
+    .brand img { height:60px; }
+    nav a { margin-left:20px; text-decoration:none; font-weight:600; color:var(--black); }
+    .hero { background:linear-gradient(to right, #ffcc00, #fff); padding:50px 20px; display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:30px; }
+    .hero-text h1 { font-size:40px; margin:0; color:var(--black); }
+    .hero-text p { font-size:18px; margin:15px 0; }
+    .btn { background:var(--black); color:var(--white); padding:12px 20px; text-decoration:none; border-radius:8px; font-weight:600; display:inline-block; margin-top:10px; }
+    .features { background:var(--white); border:2px solid var(--primary); border-radius:12px; padding:20px; margin-top:20px; }
+    .features h2 { margin-top:0; }
+    .features ul { list-style: none; padding:0; }
+    .features ul li::before { content:"✔ "; color:green; }
+    .highlight { background:var(--primary); padding:30px 20px; text-align:center; font-size:22px; font-weight:bold; margin-top:40px; border-top:5px solid var(--black); }
+    footer { background:var(--black); color:var(--white); text-align:center; padding:20px; margin-top:40px; font-size:14px; }
+    @media(max-width:768px){
+      .hero { grid-template-columns:1fr; text-align:center; }
+      nav a { margin-left:10px; }
+      .hero-text h1 { font-size:28px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden>W&amp;N</div>
-        <div>
-          <div style="font-weight:800">Wires &amp; Nail</div>
-          <div class="muted">Quality Wires · Durable Nails</div>
-        </div>
-      </div>
-      <nav>
-        <a href="#products">Products</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+  <header>
+    <div class="brand">
+      <img src="/assets/logo.png" alt="Shree Wires & Nail Logo">
+      <span>Shree Wires & Nail</span>
+    </div>
+    <nav>
+      <a href="#products">Products</a>
+      <a href="#quality">Quality</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-    <section class="hero">
-      <div class="hero-card">
-        <h1>Leading Manufacturer of Wires &amp; Nails</h1>
-        <p class="lead">Premium-grade wires and industrial nails for construction, manufacturing and retail. Bulk supply, custom sizes, and reliable dispatch across India.</p>
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Superior Export Quality Wires & Nails</h1>
+      <p>HB Wire · MS Wire · MS Nails — Manufactured with precision, certified ISO 9001:2015, trusted across India and overseas.</p>
+      <a href="#contact" class="btn">Get a Quote</a>
+    </div>
+    <div>
+      <img src="/assets/hero-nail.png" alt="MS Wire Nail" style="width:100%; max-width:400px;">
+    </div>
+  </section>
 
-        <div class="features">
-          <div class="feature">
-            <strong>High Tensile Wires</strong>
-            <div class="muted">Galvanized &amp; Stainless options</div>
-          </div>
-          <div class="feature">
-            <strong>Durable Nails</strong>
-            <div class="muted">Common, Roofing, Finishing &amp; Custom</div>
-          </div>
-          <div class="feature">
-            <strong>Bulk Supply</strong>
-            <div class="muted">Trade pricing &amp; fast delivery</div>
-          </div>
-        </div>
+  <section id="products" class="features">
+    <h2>Our Products</h2>
+    <ul>
+      <li>HB Wire — High strength, durable</li>
+      <li>MS Wire — Accurate gauge, reliable supply</li>
+      <li>MS Wire Nails — Sharp diamond point, polished finish, perfect size</li>
+    </ul>
+  </section>
 
-        <div style="margin-top:18px" class="cta-row">
-          <a class="btn" href="#contact">Get a Quote</a>
-          <a class="btn ghost" href="#products">View Products</a>
-        </div>
+  <section id="quality" class="features">
+    <h2>Why Choose Us?</h2>
+    <ul>
+      <li>ISO 9001:2015 Certified Company</li>
+      <li>Sharp & Long Diamond Point Nails</li>
+      <li>Perfect Head & Accurate Length</li>
+      <li>High Gloss Double Polished Finish</li>
+      <li>Superior Export Quality</li>
+    </ul>
+  </section>
 
-        <div style="margin-top:16px" class="muted">Call / WhatsApp: +91 XXXXXXXXXX · Email: sales@wiresandnail.com</div>
-      </div>
-
-      <aside>
-        <div class="hero-card">
-          <h3 style="margin-top:0">Featured Products</h3>
-          <div class="product-list">
-            <div class="product">
-              <img src="https://images.unsplash.com/photo-1581091012184-7a8e1e44f4b3?auto=format&fit=crop&w=800&q=60" alt="Galvanized Wire">
-              <h5>Galvanized Wire</h5>
-              <div class="muted">High tensile, corrosion-resistant</div>
-            </div>
-            <div class="product">
-              <img src="https://images.unsplash.com/photo-1581093588401-3c89d1a3b2d9?auto=format&fit=crop&w=800&q=60" alt="Common Nails">
-              <h5>Common Nails</h5>
-              <div class="muted">Multiple gauges &amp; lengths</div>
-            </div>
-            <div class="product">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=60" alt="Roofing Nails">
-              <h5>Roofing Nails</h5>
-              <div class="muted">Rust-resistant, strong head</div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;text-align:center">
-            <a class="btn" href="#contact">Request Bulk Pricing</a>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section id="about" style="margin-top:28px">
-      <div class="hero-card">
-        <h2>About Wires &amp; Nail</h2>
-        <p class="muted">We are a trusted manufacturer and supplier focusing on quality and timely delivery. With experienced production teams and stringent quality checks, we cater to builders, retailers, and industrial clients. Custom sizing, packaging and private-label options available on request.</p>
-
-        <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
-          <div style="flex:1;min-width:200px;background:var(--card);padding:12px;border-radius:10px;border:1px solid #eef4f9">
-            <strong>ISO Standards</strong>
-            <div class="muted">Manufactured in compliance with industry standards</div>
-          </div>
-          <div style="flex:1;min-width:200px;background:var(--card);padding:12px;border-radius:10px;border:1px solid #eef4f9">
-            <strong>Custom Orders</strong>
-            <div class="muted">Cut, bent, or finished per specification</div>
-          </div>
-          <div style="flex:1;min-width:200px;background:var(--card);padding:12px;border-radius:10px;border:1px solid #eef4f9">
-            <strong>Fast Dispatch</strong>
-            <div class="muted">Pan-India logistics partners for timely delivery</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="products" style="margin-top:28px">
-      <div class="hero-card">
-        <h2>Products</h2>
-        <p class="muted">A quick look at our product categories — click to get detailed spec sheets.</p>
-        <ul style="padding-left:20px">
-          <li>Galvanized Wires — Multiple gauges</li>
-          <li>Stainless Steel Wire — Corrosion resistant</li>
-          <li>Common Nails — Various lengths &amp; gauges</li>
-          <li>Roofing Nails — Coated &amp; stainless options</li>
-          <li>Finishing Nails — For fine carpentry</li>
-          <li>Custom Wire Bends &amp; Cut-to-length services</li>
-        </ul>
-      </div>
-    </section>
-
-    <section id="contact" style="margin-top:28px">
-      <div class="hero-card">
-        <h2>Contact Us</h2>
-        <p class="muted">Send your requirements and we'll respond within one business day.</p>
-        <form action="/send-enquiry" method="post" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <input name="name" placeholder="Your name" required style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
-          <input name="company" placeholder="Company (optional)" style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
-          <input name="email" placeholder="Email" type="email" required style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
-          <input name="phone" placeholder="Phone" required style="padding:10px;border-radius:8px;border:1px solid #e6eef6" />
-          <textarea name="message" placeholder="Tell us what you need (quantities, specs)" style="grid-column:1/3;padding:12px;border-radius:8px;border:1px solid #e6eef6" rows="5"></textarea>
-          <button class="btn" style="grid-column:1/3;justify-self:start">Send Enquiry</button>
-        </form>
-
-        <div style="margin-top:12px" class="muted">Or email us: sales@wiresandnail.com · Call: +91 XXXXXXXXXX</div>
-      </div>
-    </section>
-
-    <footer>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>© <strong>Wires &amp; Nail</strong> — All rights reserved.</div>
-        <div class="muted">Registered Office · City, State · GSTIN: XXXXXXXXXXX</div>
-      </div>
-    </footer>
+  <div class="highlight">
+    MADE IN INDIA · TRUSTED NO.1 BRAND · SUPERIOR EXPORT QUALITY
   </div>
 
-  <!-- Minimal JS for progressive enhancement -->
-  <script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener('click', e=>{
-        e.preventDefault();
-        const t = document.querySelector(a.getAttribute('href'));
-        if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
-      })
-    })
-  </script>
+  <section id="about" class="features">
+    <h2>About Us</h2>
+    <p>Based in Jalna, Maharashtra, Shree Wires & Nail has built a reputation as a trusted manufacturer of HB Wire, MS Wire, and MS Wire Nails. With a commitment to quality and customer satisfaction, we serve both domestic and international markets.</p>
+  </section>
+
+  <section id="contact" class="features">
+    <h2>Contact Us</h2>
+    <p>Send us your requirements and we’ll get back within 24 hours.</p>
+    <p><strong>Email:</strong> sales@wiresandnail.com</p>
+    <p><strong>Phone/WhatsApp:</strong> +91 XXXXXXXXXX</p>
+    <form action="/send-enquiry" method="post" style="margin-top:15px">
+      <input type="text" name="name" placeholder="Your Name" required style="padding:10px;width:100%;margin-bottom:10px;border-radius:6px;border:1px solid #ccc">
+      <input type="email" name="email" placeholder="Your Email" required style="padding:10px;width:100%;margin-bottom:10px;border-radius:6px;border:1px solid #ccc">
+      <textarea name="message" placeholder="Your Requirements" rows="5" style="padding:10px;width:100%;margin-bottom:10px;border-radius:6px;border:1px solid #ccc"></textarea>
+      <button type="submit" class="btn">Send Enquiry</button>
+    </form>
+  </section>
+
+  <footer>
+    © 2025 Shree Wires & Nail — Jalna, Maharashtra · ISO 9001:2015 Certified · All Rights Reserved
+  </footer>
 </body>
 </html>
