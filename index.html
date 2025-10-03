@@ -4,124 +4,102 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shree JMT's Wires & Nails | HB Wire, MS Wire, MS Nails</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f8f9fa;
-      color: #222;
-    }
+    /* Base reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Roboto', sans-serif; background: #fff8e1; color: #333; line-height: 1.6; }
+
+    /* Header */
     header {
-      background: #ffffff;
-      padding: 15px 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid #eee;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 30px; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      position: sticky; top: 0; z-index: 1000;
+      flex-wrap: wrap;
     }
-    header img {
-      height: 70px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      color: #333;
-    }
-    header p {
-      margin: 2px 0 0;
-      font-size: 0.95rem;
-      color: #555;
-    }
+    header img { height: 60px; }
+    header .brand { text-align: right; }
+    header h1 { font-size: 1.6rem; color: #d32f2f; }
+    header p { color: #555; font-size: 0.85rem; }
+
+    /* Hero Section */
     .hero {
-      background: linear-gradient(135deg, #ffffff, #f1f1f1);
-      padding: 80px 20px;
-      text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 80px 20px; background: linear-gradient(135deg, #fff3e0, #ffe0b2); text-align: center;
     }
-    .hero h2 {
-      font-size: 2.5rem;
-      color: #222;
-      margin-bottom: 15px;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      color: #555;
-    }
+    .hero h2 { font-size: 2.5rem; color: #d32f2f; margin-bottom: 15px; }
+    .hero p { font-size: 1.1rem; color: #555; }
+
+    /* Products Section */
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
-      padding: 40px;
+      padding: 40px 20px;
       background: #fff;
     }
     .product {
-      background: #fdfdfd;
-      border: 1px solid #ddd;
+      background: #fff3e0;
       border-radius: 12px;
       text-align: center;
       padding: 20px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .product:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 14px rgba(0,0,0,0.15);
-    }
+    .product:hover { transform: translateY(-6px); box-shadow: 0 8px 14px rgba(0,0,0,0.15); }
     .product img {
-      width: 100%;
-      border-radius: 8px;
-      height: 200px;
-      object-fit: cover;
-      margin-bottom: 15px;
+      width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;
     }
-    .product h3 {
-      color: #d32f2f;
-      margin-bottom: 10px;
-    }
-    .quality {
-      padding: 40px;
-      background: #f8f9fa;
-      text-align: center;
-    }
-    .quality h2 {
-      margin-bottom: 15px;
-      color: #222;
-    }
-    .about, .contact {
-      padding: 40px;
-      text-align: center;
-      background: #fff;
-    }
+    .product h3 { color: #d32f2f; margin-bottom: 10px; font-size: 1.2rem; }
+    .product p { color: #555; font-size: 0.95rem; }
+
+    /* Quality Section */
+    .quality { padding: 40px 20px; text-align: center; background: #fff8e1; }
+    .quality h2 { font-size: 2rem; margin-bottom: 10px; color: #d32f2f; }
+    .quality p { font-size: 1rem; color: #555; margin-bottom: 5px; }
+
+    /* About Section */
+    .about { padding: 40px 20px; text-align: center; background: #fff; }
+    .about h2 { font-size: 2rem; margin-bottom: 15px; color: #d32f2f; }
+    .about p { font-size: 1rem; color: #555; max-width: 700px; margin: auto; }
+
+    /* Contact Section */
+    .contact { padding: 40px 20px; text-align: center; background: #fff8e1; }
+    .contact h2 { font-size: 2rem; margin-bottom: 15px; color: #d32f2f; }
     .contact form {
-      max-width: 500px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 12px;
     }
     input, textarea, button {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
+      padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
     }
     button {
-      background: #d32f2f;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
+      background: #d32f2f; color: #fff; border: none; cursor: pointer; font-weight: bold;
       transition: background 0.3s ease;
     }
-    button:hover {
-      background: #a71d2a;
+    button:hover { background: #a71d2a; }
+
+    /* Footer */
+    footer { background: #111; color: #fff; text-align: center; padding: 20px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      header .brand { text-align: left; }
+      .hero h2 { font-size: 2rem; }
+      .hero p { font-size: 1rem; }
+      .products { grid-template-columns: 1fr; padding: 30px 10px; }
+      .product img { height: 200px; }
+      .quality h2, .about h2, .contact h2 { font-size: 1.6rem; }
+      .quality p, .about p, .contact p { font-size: 0.95rem; }
     }
-    footer {
-      background: #111;
-      color: #fff;
-      text-align: center;
-      padding: 15px;
-      margin-top: 30px;
+
+    @media (max-width: 480px) {
+      header img { height: 50px; }
+      .hero { padding: 60px 15px; }
+      .hero h2 { font-size: 1.8rem; }
+      .hero p { font-size: 0.95rem; }
+      .product img { height: 180px; }
+      input, textarea, button { font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -129,7 +107,7 @@
 
   <header>
     <img src="images/wiresandnailslogo.png" alt="Shree JMT's Wires & Nails Logo">
-    <div>
+    <div class="brand">
       <h1>Shree JMT's Wires & Nails</h1>
       <p>HB Wire | MS Wire | MS Nails</p>
     </div>
