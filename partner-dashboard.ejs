@@ -77,10 +77,10 @@
         .dashboard-card {
             background: white;
             padding: 25px;
+            border-left: 5px solid #ff9800;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             text-align: left;
-            border-left: 5px solid #ff9800;
             position: relative; 
         }
         .dashboard-card h3 {
@@ -475,14 +475,22 @@
         // --- GLOBAL STATE VARIABLES ---
         setLogLevel('Debug'); // Enable Firestore logging
         
+        // Safely access global variables, defaulting to placeholders if undefined
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
+        
+        // Attempt to parse firebase config, safely falling back to an empty object
+        let firebaseConfig = {};
+        try {
+             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        } catch (e) {
+            console.error("Critical Error: Failed to parse __firebase_config string.", e);
+        }
+        
         let db = null;
         let userId = null;
-        let dealerList = []; // Real-time array of dealer documents
-        let editingDealerId = null; // Tracks which dealer is being edited/added
+        let dealerList = []; 
+        let editingDealerId = null; 
 
         // --- DOM ELEMENTS ---
         const dealerListDisplay = document.getElementById('dealerListDisplay');
@@ -495,13 +503,20 @@
         // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
 
         async function setupFirebase() {
+            // DIAGNOSTICS: Log environment state to help user debug missing config
+            console.log("--- Firebase Setup Diagnostics ---");
+            console.log("Canvas App ID:", appId);
+            console.log("Initial Auth Token Status:", initialAuthToken ? "Token Present" : "Token Missing/Null");
+            console.log("Parsed Firebase Config:", firebaseConfig); 
+            console.log("----------------------------------");
+            
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config object is empty. Cannot initialize Firebase.");
+                loadingMessage.textContent = "Error: Firebase configuration missing. Please ensure the hosting environment is correctly providing the configuration.";
+                return;
+            }
+            
             try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase config is missing.");
-                    loadingMessage.textContent = "Error: Firebase configuration missing.";
-                    return;
-                }
-                
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 const auth = getAuth(app);
@@ -517,18 +532,17 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
+                        console.log("User Authenticated:", userId);
                         // 3. Once we have the user ID, start the real-time listener
                         setupDealerListener(); 
                     } else {
-                        // Fallback or error state if auth failed
-                        console.error("Authentication failed. Cannot access user-specific data.");
-                        userId = 'anonymous'; // Use a generic ID if needed, though security rules might block access
-                        loadingMessage.textContent = "Error: Failed to authenticate user.";
+                        console.error("Authentication failed or user logged out.");
+                        loadingMessage.textContent = "Error: Authentication failed.";
                     }
                 });
 
             } catch (error) {
-                console.error("Firebase setup failed:", error);
+                console.error("Firebase setup failed during initialization or auth:", error);
                 loadingMessage.textContent = `Failed to connect to the database: ${error.message}`;
             }
         }
@@ -536,8 +550,12 @@
         // --- REAL-TIME DATA LISTENER ---
 
         function setupDealerListener() {
-            if (!db || !userId) return;
+            if (!db || !userId) {
+                console.warn("Database or User ID is missing, cannot setup listener.");
+                return;
+            }
 
+            // Path for private user data: /artifacts/{appId}/users/{userId}/dealers
             const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
             const dealersCollectionRef = collection(db, collectionPath);
             
@@ -547,17 +565,16 @@
             onSnapshot(dealersCollectionRef, (snapshot) => {
                 dealerList = [];
                 snapshot.forEach((doc) => {
-                    // Store the document ID with the data for update/delete operations
                     dealerList.push({ id: doc.id, ...doc.data() });
                 });
                 
                 // Re-render the UI whenever the data changes
                 renderDealerList();
             }, (error) => {
-                console.error("Error fetching dealers:", error);
+                console.error("Error fetching dealers (onSnapshot failed):", error);
                 dealerListDisplay.innerHTML = 
                     `<p style="text-align: center; color: #d32f2f;">
-                        Error loading dealer data. Check console for details.
+                        Error loading dealer data. Security rules or connection error.
                     </p>`;
             });
         }
@@ -625,11 +642,10 @@
             dealerListDisplay.innerHTML = tableHTML;
         }
 
-        // Opens the form for adding (null) or editing (dealer ID)
+        // Exposing to global scope for HTML onclick attributes
         window.openDealerForm = function(dealerId = null) {
             detailsForm.reset();
             formMessage.style.display = 'none';
-            // Use 'null' string if passed from HTML/onclick, otherwise check for actual null
             editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
             if (editingDealerId) {
@@ -656,12 +672,10 @@
             dealerFormCard.style.display = 'block';
         }
         
-        // Closes the form and returns to the list view
         window.closeDealerForm = function() {
             editingDealerId = null;
             dealerFormCard.style.display = 'none';
             document.getElementById('dealerManagementCard').style.display = 'block';
-            // List rerenders automatically via onSnapshot
         }
         
         // --- FORM SUBMISSION HANDLER ---
@@ -679,7 +693,9 @@
                 contact_person: document.getElementById('contactPerson').value.trim(),
                 phone_number: document.getElementById('phoneNumber').value.trim(),
                 gstin_number: document.getElementById('gstinNumber').value.trim(),
-                address: document.getElementById('address').value.trim()
+                address: document.getElementById('address').value.trim(),
+                // Add a timestamp for potential sorting later
+                updated_at: new Date().toISOString()
             };
             
             showMessage('loading', editingDealerId ? 'Updating dealer...' : 'Adding new dealer...');
@@ -688,23 +704,22 @@
                 const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
                 
                 if (editingDealerId) {
-                    // EDIT MODE: Update existing document
+                    // EDIT MODE
                     const dealerRef = doc(db, collectionPath, editingDealerId);
                     await setDoc(dealerRef, formData, { merge: true });
                     showMessage('success', 'Dealer updated successfully!');
                 } else {
-                    // ADD MODE: Create a new document
+                    // ADD MODE
                     const dealersCollectionRef = collection(db, collectionPath);
                     await addDoc(dealersCollectionRef, formData);
                     showMessage('success', 'New dealer added successfully!');
                 }
 
-                // Close form only after successful database operation
                 closeDealerForm(); 
 
             } catch (error) {
                 console.error('Firestore save failed:', error);
-                showMessage('error', `Failed to save dealer: ${error.message}`);
+                showMessage('error', `Failed to save dealer: ${error.message}. Check console for details.`);
             }
         });
 
