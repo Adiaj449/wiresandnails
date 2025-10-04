@@ -13,33 +13,37 @@ box-sizing: border-box;
   1. Link to Google Fonts in your HTML <head> first:
      <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 */
+/*
+  1. Link to Google Fonts in your HTML <head> first, requesting the condensed variant:
+     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+*/
 
 body {
-/* Set a dark, industrial background for contrast */
+/* Set a dark, industrial background */
 background-color: #1A1A1A; /* Near Black */
 
-/* Default white font for all body text */
-font-family: 'Montserrat', sans-serif;
+/* Set Roboto Condensed as the main font with white text */
+font-family: 'Roboto Condensed', sans-serif;
 color: #FFFFFF; 
 }
 
 h1 {
 /* Main title: JMTS Shree Wires & Nails */
-font-family: 'Bebas Neue', sans-serif;
-font-weight: 400; /* Bebas Neue is only one weight, but naturally bold */
-font-size: 3.5em; 
-letter-spacing: 2px; /* Adds a modern, strong touch */
+font-family: 'Roboto Condensed', sans-serif;
+font-weight: 700; /* Bold weight for the heading */
+font-size: 3em; 
+letter-spacing: 1px; /* Slight spacing for an industrial feel */
 
 /* Pure white text */
 color: #FFFFFF; 
 }
 
 p {
-/* Paragraphs: HB Wire Products Manufacturer in Jalna */
-font-family: 'Montserrat', sans-serif;
-font-weight: 400; /* Regular weight */
+/* Paragraphs and descriptions */
+font-family: 'Roboto Condensed', sans-serif;
+font-weight: 400; /* Regular weight for easy reading */
 font-size: 1.1em;
-color: #F4F4F4; /* Slight off-white to reduce eye strain on dark background */
+color: #F4F4F4; /* Slight off-white to maintain contrast and reduce eye strain */
 }
 
 a {
@@ -48,11 +52,11 @@ display: inline-block;
 text-decoration: none;
 padding: 10px 20px;
 border-radius: 4px;
-font-family: 'Montserrat', sans-serif;
+font-family: 'Roboto Condensed', sans-serif;
 font-weight: 700; /* Bold */
 
-/* Use a bright accent color for the button on the dark background */
-background-color: #E6B31E; /* A bright, industrial gold/yellow */ 
+/* Use a bright accent color (Industrial Gold/Yellow) for visibility */
+background-color: #E6B31E; 
 color: #1A1A1A; /* Dark text on the bright button for high contrast */
 border: none;
 transition: background-color 0.3s;
