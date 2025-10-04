@@ -3,40 +3,55 @@ const session = require('express-session');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const pgSession = require('connect-pg-simple')(session); // NEW: PostgreSQL session store
 
 const app = express();
-const port = 3000;
+// Railway requires listening on the PORT environment variable
+const port = process.env.PORT || 3000; 
 
 // ==============================================
-// 1. DATABASE CONFIGURATION
+// 1. DATABASE CONFIGURATION (Using Environment Variables)
 // ==============================================
 const pool = new Pool({
-    user: 'postgres',
-    host: 'shuttle.proxy.rlwy.net',
-    database: 'railway',
-    password: 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
-    port: 52101,
+    // Retrieve credentials from Railway's environment variables
+    user: process.env.DB_USER || 'postgres',
+    host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
+    database: process.env.DB_NAME || 'railway', // Use your specific DB name
+    password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
+    port: process.env.DB_PORT || 52101,
+    
+    // Required for external connections (Node.js container to Railway DB)
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 // ==============================================
 // 2. MIDDLEWARE SETUP
 // ==============================================
 
-// For serving static files (CSS, Images, Video)
+// For serving static files (CSS, Images, Video) from the root directory
 app.use(express.static(__dirname));
 
 // To parse form data (the username and password)
 app.use(express.urlencoded({ extended: true }));
 
-// Session Middleware Configuration
+// Session Middleware Configuration (Using PostgreSQL for production safety)
 app.use(session({
-    secret: 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', // <-- CHANGE THIS!
+    // CRITICAL FIX: Use the PostgreSQL store instead of MemoryStore
+    store: new pgSession({
+        pool: pool,          // Use the existing PostgreSQL connection pool
+        tableName: 'session' // The table where session data will be stored
+    }),
+    // Load secret key from environment variable (MANDATORY for security)
+    secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
     resave: false, 
     saveUninitialized: false,
     cookie: { 
-        maxAge: 1000 * 60 * 60 * 24, // Session lasts 24 hours
-        httpOnly: true, // Prevents client-side JS access to the cookie
-        // secure: true // Uncomment this if you deploy with HTTPS
+        maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        httpOnly: true, // Prevents client-side JS access
+        // Set 'secure: true' ONLY if deployed via HTTPS (i.e., on Railway with NODE_ENV=production)
+        secure: process.env.NODE_ENV === 'production' 
     }
 }));
 
@@ -54,14 +69,12 @@ app.get('/', (req, res) => {
 app.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
-    // 1. Basic Validation
     if (!username || !password) {
-        // In a real app, you would redirect with an error message. 
-        return res.status(400).send('Please enter both username and password.');
+        return res.redirect('/?loginError=MissingFields'); 
     }
 
     try {
-        // 2. Find User
+        // Find User
         const result = await pool.query(
             'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
@@ -69,54 +82,34 @@ app.post('/auth/login', async (req, res) => {
 
         const user = result.rows[0];
 
-        // 3. User Not Found
-        if (!user) {
-            return res.status(401).send('Invalid credentials.'); // Generic error
+        // 3. User Not Found OR 4. Verify Password
+        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+            // FAILED: Redirect back to home with an error parameter
+            return res.redirect('/?loginError=InvalidCredentials');
         }
 
-        // 4. Verify Password
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-
-        if (isMatch) {
-            // 5. SUCCESS: Create Session
-            req.session.userId = user.id;
-            req.session.isPartner = user.is_partner;
-            
-            // 6. Redirect to Protected Area
-            // NOTE: You will need to create a 'partner-dashboard.html' file next!
-            return res.redirect('/partner/dashboard');
-        } else {
-            // 7. FAILED Password
-            return res.status(401).send('Invalid credentials.'); // Generic error
-        }
+        // 5. SUCCESS: Create Session
+        req.session.userId = user.id;
+        req.session.isPartner = user.is_partner;
+        
+        // 6. Redirect to Protected Area
+        return res.redirect('/partner/dashboard');
 
     } catch (error) {
-        console.error('Login error:', error);
-        return res.status(500).send('An unexpected server error occurred.');
+        console.error('Login database or bcrypt error:', error);
+        return res.redirect('/?loginError=ServerError');
     }
 });
 
 
 // C. PROTECTED DASHBOARD ROUTE
-// This route is only accessible if the user has a valid session.
 app.get('/partner/dashboard', (req, res) => {
+    // Check if user has a valid session and the isPartner flag is true
     if (req.session.userId && req.session.isPartner) {
-        // Send a simple response or serve a protected HTML file
-        res.send(`
-            <!DOCTYPE html>
-            <html>
-            <head><title>Partner Dashboard</title></head>
-            <body>
-                <h1>Welcome Back, Partner ${req.session.userId}!</h1>
-                <p>This is your secure dashboard content.</p>
-                <form action="/auth/logout" method="POST">
-                    <button type="submit">Logout</button>
-                </form>
-            </body>
-            </html>
-        `);
+        // Serves the actual HTML file you created in your project
+        res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // User is not logged in or not authorized
+        // If not logged in or not authorized
         res.redirect('/');
     }
 });
@@ -129,7 +122,7 @@ app.post('/auth/logout', (req, res) => {
             console.error('Logout error:', err);
             return res.status(500).send('Could not log out.');
         }
-        // Redirect to the home page
+        // Redirect to the home page (login modal)
         res.redirect('/');
     });
 });
@@ -139,5 +132,6 @@ app.post('/auth/logout', (req, res) => {
 // 4. START THE SERVER
 // ==============================================
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
+    console.log(`Node environment: ${process.env.NODE_ENV || 'development'}`);
 });
