@@ -14,6 +14,31 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
   
+  <style>
+    /* New CSS for the password toggle button */
+    .password-container {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+        font-size: 1.1em;
+        transition: color 0.2s;
+        z-index: 10;
+    }
+    
+    .toggle-password:hover {
+        color: #1a237e; /* Match main brand color on hover */
+    }
+
+    /* NOTE: You should integrate all other styles (hero, modal, etc.) from your existing stylesheet if possible.
+       Since I don't have your style/style.css, I am only adding the new necessary styles here. */
+  </style>
 </head>
 <body>
 
@@ -64,7 +89,7 @@
           >
         </div>
         
-        <div class="input-group">
+        <div class="input-group password-container">
           <label for="password">Password</label>
           <input 
             type="password" 
@@ -73,6 +98,8 @@
             placeholder="••••••••" 
             required
           >
+          <!-- 🛑 TOGGLE BUTTON ADDED HERE 🛑 -->
+          <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
         </div>
         
         <button type="submit" class="login-button">
@@ -268,6 +295,21 @@
             document.getElementById('login-error-message').textContent = "An unexpected server error occurred. Try again.";
         }
     });
+
+    // 🛑 NEW JAVASCRIPT FOR PASSWORD TOGGLE 🛑
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function (e) {
+        // Toggle the type attribute between 'password' and 'text'
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle the icon (eye-slash for hidden, eye for visible)
+        this.classList.toggle('fa-eye-slash');
+        this.classList.toggle('fa-eye');
+    });
+
   </script>
 </body>
 </html>
