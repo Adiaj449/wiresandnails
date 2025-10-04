@@ -1,91 +1,112 @@
+/* GLOBAL RESET */
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/*
-  1. Link to Google Font in your HTML <head> first:
-     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-*/
-
-/*
-  1. Link to Google Fonts in your HTML <head> first:
-     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-*/
-/*
-  1. Link to Google Fonts in your HTML <head> first, requesting the condensed variant:
-     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
-*/
-
+/* Base Body Styles (Dark Industrial Theme) */
 body {
-/* Set a dark, industrial background */
-background-color: #1A1A1A; /* Near Black */
-
-/* Set Roboto Condensed as the main font with white text */
-font-family: 'Roboto Condensed', sans-serif;
-color: #FFFFFF; 
+    background-color: #1A1A1A; /* Near Black */
+    font-family: 'Roboto Condensed', sans-serif;
+    color: #FFFFFF; /* Default text color is white */
 }
 
+/* Base Typography */
 h1 {
-/* Main title: JMTS Shree Wires & Nails */
-font-family: 'Roboto Condensed', sans-serif;
-font-weight: 700; /* Bold weight for the heading */
-font-size: 3em; 
-letter-spacing: 1px; /* Slight spacing for an industrial feel */
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 3em; 
+    letter-spacing: 1px;
+    color: #FFFFFF; 
+}
 
-/* Pure white text */
-color: #FFFFFF; 
+h2 {
+    /* Main section headings */
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #E6B31E; /* Industrial Gold accent */
+}
+
+h3 {
+    font-family: 'Roboto Condensed', sans-serif;
+    color: #E6B31E;
 }
 
 p {
-/* Paragraphs and descriptions */
-font-family: 'Roboto Condensed', sans-serif;
-font-weight: 400; /* Regular weight for easy reading */
-font-size: 1.1em;
-color: #F4F4F4; /* Slight off-white to maintain contrast and reduce eye strain */
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 400;
+    font-size: 1.1em;
+    color: #F4F4F4;
 }
 
-a {
-/* Call-to-action link: Explore Products */
-display: inline-block;
-text-decoration: none;
-padding: 10px 20px;
-border-radius: 4px;
-font-family: 'Roboto Condensed', sans-serif;
-font-weight: 700; /* Bold */
-
-/* Use a bright accent color (Industrial Gold/Yellow) for visibility */
-background-color: #E6B31E; 
-color: #1A1A1A; /* Dark text on the bright button for high contrast */
-border: none;
-transition: background-color 0.3s;
+/* Base Links/Buttons (used by Explore Products) */
+a:not(.social-icons a, .forgot-password, .footer-links ul li a) {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 28px; /* Slightly adjusted padding */
+    border-radius: 4px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    background-color: #E6B31E; 
+    color: #1A1A1A; 
+    border: none;
+    transition: background-color 0.3s;
 }
 
 a:hover {
-background-color: #FFC72C; /* Brighter on hover */
+    background-color: #FFC72C;
 }
 
 /* ============================================== */
-/* HERO SECTION BUTTON STYLES (New Button) */
+/* HERO SECTION & LOGIN BUTTON POSITIONING */
 /* ============================================== */
 
-/* Style for the container if you want to align the buttons */
-.hero-actions {
+.hero {
+    position: relative;
+    height: 100vh;
     display: flex;
-    gap: 15px; /* Spacing between the two buttons */
+    align-items: center;
     justify-content: center;
-    margin-top: 30px;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
 }
 
-/* Base button style (similar to the Explore Products link) */
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Style to ensure the button is positioned relative to the hero section */
+.hero {
+    position: relative; /* CRITICAL */
+    padding-top: 50px; /* Add padding to prevent content/button overlap */
+}
+
+/* Partner Login Trigger Button (Top Right Position) */
 .login-trigger-button {
-    padding: 15px 30px;
-    background-color: #E6B31E; /* Industrial Gold */
+    /* CRITICAL: Positioning the button */
+    position: absolute; 
+    top: 20px;
+    right: 20px;
+    z-index: 10; /* Ensures it sits above the video and content */
+    
+    /* Button appearance (overriding base 'a' style for padding) */
+    padding: 10px 20px;
+    background-color: #E6B31E;
     color: #1A1A1A; 
     border: none;
     border-radius: 4px;
-    font-size: 1.1em;
+    font-size: 1em;
     font-family: 'Roboto Condensed', sans-serif;
     font-weight: 700;
     cursor: pointer;
@@ -100,29 +121,322 @@ background-color: #FFC72C; /* Brighter on hover */
     margin-right: 8px;
 }
 
+
+.hero-content {
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.6); /* Darker overlay for text contrast */
+    padding: 40px 20px;
+    border-radius: 12px;
+    max-width: 800px;
+    animation: fadeIn 2s ease-in-out;
+}
+
+.logo-wires {
+    max-width: 150px; /* Resetting size to a reasonable default */
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.hero-content h1 {
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Styling for the Explore Products link inside hero-actions */
+.hero-actions a {
+    /* Use the base 'a' style defined earlier */
+    background-color: #E6B31E; 
+    color: #1A1A1A; 
+}
+.hero-actions {
+    justify-content: center;
+    margin-top: 30px;
+}
+
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
 /* ============================================== */
-/* MODAL OVERLAY STYLES */
+/* PRODUCT & ABOUT SECTIONS (Unified Dark Theme) */
+/* ============================================== */
+
+/* Main Section Backgrounds (Ensure dark theme) */
+.products, .about, .contact {
+    background-color: #1A1A1A;
+    padding: 80px 20px;
+    color: #FFFFFF;
+}
+
+/* Product Section */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.product {
+    background: #2c2c2c; /* Dark background for product cards */
+    border-radius: 15px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+}
+
+.product-icon i {
+    font-size: 3rem;
+    color: #E6B31E; /* Industrial Gold icon color */
+    margin-bottom: 15px;
+    transition: transform 0.4s ease;
+}
+
+.product:hover .product-icon i {
+    transform: rotate(10deg) scale(1.1);
+}
+
+.product h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #FFFFFF;
+}
+
+.product p {
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+/* About Section */
+.about-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    color: #F4F4F4;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.commitment-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.commitment-box {
+    background: #2c2c2c;
+    border-left: 5px solid #E6B31E; /* Gold border accent */
+    border-radius: 8px;
+    padding: 25px;
+    text-align: left;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.commitment-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(230, 179, 30, 0.4);
+}
+
+.commitment-box i {
+    font-size: 2rem;
+    color: #E6B31E;
+    margin-bottom: 10px;
+}
+
+.commitment-box h3 {
+    font-size: 1.3rem;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.commitment-box p {
+    font-size: 0.95rem;
+    color: #bbb;
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* ============================================== */
+/* CONTACT SECTION */
+/* ============================================== */
+
+.contact-grid {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+    text-align: left;
+}
+
+.contact-info-block {
+    background: #2c2c2c;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.contact-info-block h3 {
+    font-size: 1.5rem;
+    color: #E6B31E;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+}
+
+.contact-detail {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+    font-size: 1rem;
+    color: #F4F4F4;
+}
+
+.contact-detail i {
+    color: #E6B31E;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    width: 30px;
+    text-align: center;
+}
+
+.contact-form {
+    background: #2c2c2c;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.contact-form h3 {
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+}
+
+/* WhatsApp Button Styling */
+.whatsapp-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background: #25D366; 
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.whatsapp-button i {
+    font-size: 1.4rem;
+    margin-right: 10px;
+}
+
+.whatsapp-button:hover {
+    background: #1DA851;
+    transform: translateY(-2px);
+}
+
+/* ============================================== */
+/* FOOTER */
+/* ============================================== */
+
+.footer {
+    background-color: #111111; /* Even darker footer */
+    color: #e0e0e0;
+    padding: 60px 20px 30px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.footer-logo h3 {
+    color: #E6B31E;
+}
+
+.footer-links h4,
+.footer-contact h4,
+.footer-social h4 {
+    color: #FFFFFF;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+}
+
+.footer-links ul li a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.footer-links ul li a:hover {
+    color: #E6B31E;
+}
+
+.footer-contact i {
+    color: #E6B31E;
+}
+
+.social-icons a {
+    color: #ccc;
+    font-size: 1.2rem;
+    margin-right: 12px;
+}
+
+.social-icons a:hover {
+    color: #E6B31E;
+    transform: scale(1.2);
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid #333;
+    margin-top: 30px;
+    padding-top: 15px;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* ============================================== */
+/* MODAL OVERLAY & FORM STYLES (Kept from previous response) */
 /* ============================================== */
 
 /* The Modal (background overlay) */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none; /* CRITICAL: Hidden by default */
+    position: fixed; 
+    z-index: 1000; 
     left: 0;
     top: 0;
     width: 100%; 
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-}
-
-/* Modal Content Box */
-.modal-content {
-    animation-name: animatetop;
-    animation-duration: 0.4s;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center; 
+    align-items: center; 
 }
 
 /* Close Button (the 'x') */
@@ -150,24 +464,20 @@ background-color: #FFC72C; /* Brighter on hover */
     to {top: 0; opacity: 1}
 }
 
-
-/* ============================================== */
-/* LOGIN FORM STYLES (from previous response) */
-/* ============================================== */
-
-/* The actual box surrounding the form elements */
+/* Login Box */
 .login-box {
     background-color: #2c2c2c;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     width: 100%;
-    max-width: 350px; /* Limits the width of the form for better focus */
+    max-width: 350px; 
     text-align: center;
-    position: relative; /* Needed for absolute positioning of close button */
+    position: relative;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
 }
 
-/* Heading style */
 .login-heading {
     font-family: 'Roboto Condensed', sans-serif;
     font-weight: 700;
@@ -176,7 +486,6 @@ background-color: #FFC72C; /* Brighter on hover */
     margin-bottom: 5px;
 }
 
-/* Subtitle/description text */
 .subtitle {
     font-family: 'Roboto Condensed', sans-serif;
     color: #a0a0a0;
@@ -184,7 +493,6 @@ background-color: #FFC72C; /* Brighter on hover */
     font-size: 1em;
 }
 
-/* Form Grouping */
 .login-form {
     text-align: left;
 }
@@ -193,41 +501,37 @@ background-color: #FFC72C; /* Brighter on hover */
     margin-bottom: 15px;
 }
 
-/* Input labels */
 .input-group label {
     display: block;
     margin-bottom: 5px;
     font-family: 'Roboto Condensed', sans-serif;
     font-weight: 700;
-    color: #E6B31E; /* Industrial Gold accent color for labels */
+    color: #E6B31E;
     font-size: 0.9em;
 }
 
-/* Text and password input fields */
 .input-group input {
     width: 100%;
     padding: 10px;
     border: 1px solid #444;
     border-radius: 4px;
-    background-color: #383838; /* Darker input background */
+    background-color: #383838;
     color: #FFFFFF;
     font-size: 1em;
     font-family: 'Roboto Condensed', sans-serif;
     box-sizing: border-box;
 }
 
-/* Focus state for inputs */
 .input-group input:focus {
     border-color: #E6B31E;
     outline: none;
 }
 
-/* Login Button */
 .login-button {
     width: 100%;
     padding: 12px;
-    background-color: #E6B31E; /* Industrial Gold */
-    color: #1A1A1A; /* Dark text for high contrast */
+    background-color: #E6B31E; 
+    color: #1A1A1A; 
     border: none;
     border-radius: 4px;
     font-size: 1em;
@@ -239,14 +543,9 @@ background-color: #FFC72C; /* Brighter on hover */
 }
 
 .login-button:hover {
-    background-color: #FFC72C; /* Brighter gold on hover */
+    background-color: #FFC72C;
 }
 
-.login-button i {
-    margin-right: 8px;
-}
-
-/* Links (Forgot Password) */
 .forgot-password {
     display: block;
     text-align: right;
@@ -260,454 +559,28 @@ background-color: #FFC72C; /* Brighter on hover */
 .forgot-password:hover {
     color: #FFC72C;
 }
-#main-logo-override {
-    width: 450px !important;  /* Set the exact size you want */
-    height: auto !important;  /* Keep the aspect ratio */
-}
-/* Or if you want it even bigger */
-.logo-wires {
-    max-width: 600px !important; 
-    height: auto !important;
-}
 
-/* Hero Section */
-.hero {
-position: relative;
-height: 100vh;
-display: flex;
-align-items: center;
-justify-content: center;
-text-align: center;
-color: #fff;
-overflow: hidden;
-}
-
-.video-background {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-object-fit: cover;
-z-index: -1;
-}
-
-.hero-content {
-z-index: 2;
-background: rgba(0, 0, 0, 0.5);
-padding: 40px 20px;
-border-radius: 12px;
-max-width: 800px;
-animation: fadeIn 2s ease-in-out;
-}
-
-.hero-content img {
-width: 120px;
-margin-bottom: 15px;
-}
-
-.hero-content h1 {
-font-size: 2.8rem;
-margin-bottom: 10px;
-text-transform: uppercase;
-}
-
-.hero-content p {
-font-size: 1.2rem;
-margin-bottom: 20px;
-}
-
-.hero-content a {
-display: inline-block;
-padding: 12px 28px;
-background: #d32f2f;
-color: #fff;
-text-decoration: none;
-font-weight: 600;
-border-radius: 50px;
-transition: background 0.3s ease;
-}
-
-.hero-content a:hover {
-background: #b71c1c;
-}
-
-@keyframes fadeIn {
-from {opacity: 0; transform: translateY(20px);}
-to {opacity: 1; transform: translateY(0);}
-}
-
-/* Product Section */
-.products {
-text-align: center;
-padding: 80px 20px;
-background-color: #f8f8f8;
-}
-
-.products h2 {
-font-size: 2.2rem;
-color: #222;
-margin-bottom: 50px;
-}
-
-.product-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-gap: 40px;
-max-width: 1100px;
-margin: 0 auto;
-}
-
-.product {
-background: #fff;
-border-radius: 15px;
-padding: 30px 20px;
-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.product:hover {
-transform: translateY(-10px);
-box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-}
-
-.product-icon i {
-font-size: 3rem;
-color: #d32f2f;
-margin-bottom: 15px;
-transition: transform 0.4s ease;
-}
-
-.product:hover .product-icon i {
-transform: rotate(10deg) scale(1.2);
-}
-
-.product h3 {
-font-size: 1.3rem;
-margin-bottom: 10px;
-color: #222;
-}
-
-.product p {
-font-size: 0.95rem;
-color: #555;
-}
-
-/* About Section - MODERNIZED COMMITMENT HIGHLIGHTS */
-.about {
-padding: 80px 20px;
-background: #fff;
-text-align: center;
-}
-
-.about h2 {
-font-size: 2.5rem;
-margin-bottom: 20px;
-color: #d32f2f; /* Highlighted color */
-font-weight: 700;
-}
-
-.about-content {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 40px;
-}
-
-.about-text {
-    text-align: center; /* Center the introductory text */
-    max-width: 900px;
-}
-
-.about-text p {
-font-size: 1.1rem;
-color: #555;
-line-height: 1.8;
-margin-bottom: 20px;
-}
-
-/* New Grid for Commitment Highlights */
-.commitment-grid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.commitment-box {
-    background: #fdf6f6; /* Light background for contrast */
-    border-left: 5px solid #d32f2f; /* Red border accent */
-    border-radius: 8px;
-    padding: 25px;
-    text-align: left;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.commitment-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(211, 47, 47, 0.2);
-}
-
-.commitment-box i {
-    font-size: 2rem;
-    color: #d32f2f;
-    margin-bottom: 10px;
-}
-
-.commitment-box h3 {
-    font-size: 1.3rem;
-    color: #222;
-    margin-bottom: 10px;
-}
-
-.commitment-box p {
-    font-size: 0.95rem;
-    color: #777;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* Hiding the old stats grid (if it were still present) */
-.about-stats {
-    display: none;
-}
-
-
-/* Contact Section - STYLISH UPDATE */
-.contact {
-background: #f8f8f8;
-padding: 80px 20px;
-text-align: center;
-}
-
-.contact h2 {
-font-size: 2.5rem;
-color: #222;
-margin-bottom: 40px;
-font-weight: 700;
-}
-
-.contact-grid {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1.2fr; /* Info on left, Form/WhatsApp on right */
-    gap: 40px;
-    text-align: left;
-}
-
+/* Media Queries for Responsiveness */
 @media (max-width: 850px) {
     .contact-grid {
         grid-template-columns: 1fr;
     }
 }
-
-.contact-info-block {
-    background: #fff;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.contact-info-block h3 {
-    font-size: 1.5rem;
-    color: #d32f2f;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-
-.contact-detail {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
-    font-size: 1rem;
-    color: #555;
-}
-
-.contact-detail i {
-color: #d32f2f;
-font-size: 1.5rem;
-margin-right: 15px;
-width: 30px;
-text-align: center;
-}
-
-.contact-detail a {
-    color: #555;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-.contact-detail a:hover {
-    color: #d32f2f;
-}
-
-/* WhatsApp Button Styling */
-.whatsapp-button {
-display: block;
-width: 100%;
-padding: 15px;
-margin-top: 20px;
-background: #25D366; /* WhatsApp Green */
-color: #fff;
-text-decoration: none;
-font-size: 1.2rem;
-font-weight: 600;
-border-radius: 50px; /* Pill shape */
-transition: background 0.3s ease, transform 0.3s ease;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-text-align: center;
-}
-
-.whatsapp-button i {
-    font-size: 1.4rem;
-    margin-right: 10px;
-}
-
-.whatsapp-button:hover {
-background: #1DA851;
-transform: translateY(-2px);
-}
-
-/* Simple Contact Form Styling */
-.contact-form {
-    background: #fff;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.contact-form h3 {
-    font-size: 1.5rem;
-    color: #222;
-    margin-bottom: 20px;
-}
-
-.contact-form input, .contact-form textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-
-.contact-form input:focus, .contact-form textarea:focus {
-    border-color: #d32f2f;
-    outline: none;
-}
-
-.contact-form button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background: #d32f2f;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.contact-form button:hover {
-    background: #b71c1c;
-}
-
-/* Footer */
-.footer {
-background-color: #1b1b1b;
-color: #e0e0e0;
-padding: 60px 20px 30px;
-font-family: 'Poppins', sans-serif;
-}
-
-.footer-container {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-gap: 30px;
-max-width: 1200px;
-margin: 0 auto;
-}
-
-.footer-logo img {
-width: 80px;
-height: auto;
-margin-bottom: 10px;
-}
-
-.footer-logo h3 {
-color: #fff;
-font-size: 1.2rem;
-margin-bottom: 5px;
-}
-
-.footer-logo p {
-color: #bbb;
-font-size: 0.9rem;
-}
-
-.footer-links h4,
-.footer-contact h4,
-.footer-social h4 {
-color: #f5f5f5;
-font-size: 1rem;
-margin-bottom: 15px;
-}
-
-.footer-links ul {
-list-style: none;
-padding: 0;
-}
-
-.footer-links ul li {
-margin-bottom: 8px;
-}
-
-.footer-links ul li a {
-color: #ccc;
-text-decoration: none;
-transition: color 0.3s ease;
-}
-
-.footer-links ul li a:hover {
-color: #ff5252;
-}
-
-.footer-contact p {
-font-size: 0.9rem;
-margin-bottom: 8px;
-}
-
-.footer-contact i {
-margin-right: 8px;
-color: #ff5252;
-}
-
-.social-icons a {
-color: #ccc;
-font-size: 1.2rem;
-margin-right: 12px;
-transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.social-icons a:hover {
-color: #ff5252;
-transform: scale(1.2);
-}
-
-.footer-bottom {
-text-align: center;
-border-top: 1px solid #333;
-margin-top: 30px;
-padding-top: 15px;
-font-size: 0.85rem;
-color: #888;
+@media (max-width: 600px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    .hero-content p {
+        font-size: 1rem;
+    }
+    .hero-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .login-trigger-button {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
 }
