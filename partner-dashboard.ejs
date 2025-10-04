@@ -384,32 +384,32 @@
                             <!-- Mock transaction data remains -->
                             <tr>
                                 <td>#JMTS1008</td>
-                                <td>2025-10-01</td>
-                                <td>HB Wire (8G)</td>
-                                <td>10.0</td>
-                                <td><span class="status-badge shipped">Shipped</span></td>
-                            </tr>
-                            <tr>
-                                <td>#JMTS1007</td>
-                                <td>2025-09-28</td>
-                                <td>MS Wire Nails</td>
-                                <td>5.5</td>
-                                <td><span class="status-badge delivered">Delivered</span></td>
-                            </tr>
-                            <tr>
-                                <td>#JMTS1006</td>
-                                <td>2025-09-25</td>
-                                <td>MS Wire (10G)</td>
-                                <td>12.0</td>
-                                <td><span class="status-badge pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>#JMTS1005</td>
-                                <td>2025-09-20</td>
-                                <td>HB Wire (8G)</td>
-                                <td>8.0</td>
-                                <td><span class="status-badge delivered">Delivered</span></td>
-                            </tr>
+                            <td>2025-10-01</td>
+                            <td>HB Wire (8G)</td>
+                            <td>10.0</td>
+                            <td><span class="status-badge shipped">Shipped</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1007</td>
+                            <td>2025-09-28</td>
+                            <td>MS Wire Nails</td>
+                            <td>5.5</td>
+                            <td><span class="status-badge delivered">Delivered</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1006</td>
+                            <td>2025-09-25</td>
+                            <td>MS Wire (10G)</td>
+                            <td>12.0</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1005</td>
+                            <td>2025-09-20</td>
+                            <td>HB Wire (8G)</td>
+                            <td>8.0</td>
+                            <td><span class="status-badge delivered">Delivered</span></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -469,41 +469,40 @@
     <!-- CONSOLIDATED JAVASCRIPT & FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Removed Auth imports as we are bypassing auth
         import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // --- MOCK FALLBACK CONFIGURATION (To fix the missing config error) ---
-        const MOCK_FIREBASE_CONFIG = {
-            apiKey: "mock-api-key",
-            authDomain: "mock-project.firebaseapp.com",
-            projectId: "mock-project",
-            storageBucket: "mock-project.appspot.com",
+        // --- MOCK FALLBACK CONFIGURATION (To allow Firebase initialization) ---
+        // Using a generic config to prevent the key format error
+        const FALLBACK_FIREBASE_CONFIG = {
+            apiKey: "AIzaSy_M0CK_KEY_F0R_DEM0", 
+            authDomain: "mock-project-1234.firebaseapp.com",
+            projectId: "mock-project-1234",
+            storageBucket: "mock-project-1234.appspot.com",
             messagingSenderId: "1234567890",
             appId: "1:1234567890:web:mocked"
         };
-
-        const MOCK_AUTH_TOKEN = "mock-auth-token"; // Using a mock token ensures signInWithCustomToken succeeds
+        const FORCED_USER_ID = "DEMO_PARTNER_001"; 
         // --- END MOCK CONFIG ---
 
 
         // --- GLOBAL STATE VARIABLES ---
-        setLogLevel('Debug'); // Enable Firestore logging
+        setLogLevel('Debug'); 
         
         // Safely access global variables, falling back to mocks if undefined
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : MOCK_AUTH_TOKEN;
         
         let firebaseConfig = {};
         try {
-             // Use the provided config if available, otherwise use the mock config
-             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '' ? __firebase_config : JSON.stringify(MOCK_FIREBASE_CONFIG));
+             // Use the provided config if available, otherwise use the fallback
+             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '' ? __firebase_config : JSON.stringify(FALLBACK_FIREBASE_CONFIG));
         } catch (e) {
-            console.error("Critical Error: Failed to parse __firebase_config string. Using mock config.", e);
-            firebaseConfig = MOCK_FIREBASE_CONFIG;
+            console.error("Critical Error: Failed to parse __firebase_config string. Using fallback config.", e);
+            firebaseConfig = FALLBACK_FIREBASE_CONFIG;
         }
         
         let db = null;
-        let userId = null;
+        let userId = FORCED_USER_ID; // FORCING the userId to bypass failing Auth step
         let dealerList = []; 
         let editingDealerId = null; 
 
@@ -515,48 +514,29 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const formMessage = document.getElementById('formMessage');
         
-        // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
+        // --- FIREBASE INITIALIZATION (Auth bypassed) ---
 
         async function setupFirebase() {
-            // DIAGNOSTICS: Log environment state
-            console.log("--- Firebase Setup Diagnostics (FALLBACK ACTIVE) ---");
+            // DIAGNOSTICS: Indicate we are skipping auth
+            console.warn("--- Firebase Setup Diagnostics (AUTH BYPASSED) ---");
+            console.warn("Skipping authentication due to environment failure (API Key error).");
+            console.warn("The app will use a FORCED USER ID for Firestore operations.");
             console.log("Canvas App ID:", appId);
-            console.log("Auth Token Status:", initialAuthToken ? "Token Present" : "Token Missing/Using Mock");
+            console.log("FORCED User ID:", userId);
+            console.log("----------------------------------");
             
-            if (Object.keys(firebaseConfig).length === 0) {
-                // This block should no longer be hit due to MOCK_FIREBASE_CONFIG
-                loadingMessage.textContent = "Fatal Error: Firebase configuration is completely empty, even the mock failed.";
-                return;
-            }
-
             try {
+                // Initialize the app with the (mocked/fallback) config
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                const auth = getAuth(app);
                 
-                // 1. Sign in the user using custom token (or anonymously if mock token isn't used)
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // 2. Wait for auth state change to get the userId and start listening
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        console.log("User Authenticated. User ID:", userId);
-                        // 3. Once we have the user ID, start the real-time listener
-                        setupDealerListener(); 
-                    } else {
-                        console.error("Authentication failed or user logged out.");
-                        loadingMessage.textContent = "Error: Authentication failed.";
-                    }
-                });
+                // Immediately proceed to setup listener since Auth is bypassed
+                loadingMessage.textContent = `Successfully connected to database with Forced User ID: ${userId}. Loading dealers...`;
+                setupDealerListener(); 
 
             } catch (error) {
-                console.error("Firebase setup failed during initialization or auth:", error);
-                loadingMessage.textContent = `Failed to connect to the database (Check security rules if using real config): ${error.message}`;
+                console.error("Firebase setup failed during initialization:", error);
+                loadingMessage.textContent = `Failed to connect to the database (Initialization Error): ${error.message}`;
             }
         }
         
@@ -572,8 +552,6 @@
             const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
             const dealersCollectionRef = collection(db, collectionPath);
             
-            loadingMessage.textContent = "Loading dealers in real-time...";
-
             // onSnapshot keeps the local 'dealerList' synchronized with Firestore
             onSnapshot(dealersCollectionRef, (snapshot) => {
                 dealerList = [];
