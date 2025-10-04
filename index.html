@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
-    /* CSS for the password toggle button */
+    /* New CSS for the password toggle button */
     .password-container {
         position: relative;
     }
@@ -36,6 +36,8 @@
         color: #1a237e; /* Match main brand color on hover */
     }
 
+    /* NOTE: You should integrate all other styles (hero, modal, etc.) from your existing stylesheet if possible.
+       Since I don't have your style/style.css, I am only adding the new necessary styles here. */
   </style>
 </head>
 <body>
@@ -96,7 +98,7 @@
             placeholder="••••••••" 
             required
           >
-          <!-- TOGGLE BUTTON -->
+          <!-- 🛑 TOGGLE BUTTON ADDED HERE 🛑 -->
           <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
         </div>
         
@@ -265,6 +267,7 @@
         document.getElementById('login-error-message').textContent = '';
         
         // Get form data
+        // Note: URLSearchParams(new FormData(loginForm)) is necessary for fetch POST
         const formData = new URLSearchParams(new FormData(loginForm));
 
         try {
@@ -293,7 +296,7 @@
         }
     });
 
-    // JAVASCRIPT FOR PASSWORD TOGGLE
+    // 🛑 NEW JAVASCRIPT FOR PASSWORD TOGGLE 🛑
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
 
@@ -310,4 +313,3 @@
   </script>
 </body>
 </html>
-
