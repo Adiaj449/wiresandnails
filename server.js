@@ -51,12 +51,12 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true, // Prevents client-side JS access
         
-        // CRITICAL FIXES FOR RAILWAY/HTTPS:
+        // CRITICAL FINAL FIXES FOR RAILWAY/HTTPS:
         // 1. 'secure: true' must be set when NODE_ENV is 'production' (HTTPS required)
         secure: process.env.NODE_ENV === 'production',
         
-        // 2. 'sameSite: 'Lax'' is necessary for modern browsers when 'secure' is true
-        sameSite: process.env.NODE_ENV === 'production' ? 'Lax' : false 
+        // 2. Set SameSite to 'None' for max compatibility, but only if 'secure' is true
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false 
     }
 }));
 
