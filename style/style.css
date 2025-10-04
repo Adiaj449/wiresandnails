@@ -9,53 +9,59 @@ box-sizing: border-box;
      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 */
 
-body {
-/* Set a clean light-grey background */
-background-color: #F4F4F4; /* Very light grey */
+/*
+  1. Link to Google Fonts in your HTML <head> first:
+     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+*/
 
-/* Default font for body and paragraphs */
+body {
+/* Set a dark, industrial background for contrast */
+background-color: #1A1A1A; /* Near Black */
+
+/* Default white font for all body text */
 font-family: 'Montserrat', sans-serif;
-color: #333333; /* Very Dark Grey for excellent readability */
+color: #FFFFFF; 
 }
 
 h1 {
 /* Main title: JMTS Shree Wires & Nails */
-font-family: 'Montserrat', sans-serif;
-font-weight: 700; /* Bold weight */
-font-size: 2.8em; 
+font-family: 'Bebas Neue', sans-serif;
+font-weight: 400; /* Bebas Neue is only one weight, but naturally bold */
+font-size: 3.5em; 
+letter-spacing: 2px; /* Adds a modern, strong touch */
 
-/* Use the main accent color (Dark Charcoal) */
-color: #4F4F4F; 
+/* Pure white text */
+color: #FFFFFF; 
 }
 
 p {
 /* Paragraphs: HB Wire Products Manufacturer in Jalna */
+font-family: 'Montserrat', sans-serif;
 font-weight: 400; /* Regular weight */
 font-size: 1.1em;
-color: #333333; 
+color: #F4F4F4; /* Slight off-white to reduce eye strain on dark background */
 }
 
 a {
 /* Call-to-action link: Explore Products */
-display: inline-block; /* Makes padding/margins work well */
-text-decoration: none; /* Remove underline */
+display: inline-block;
+text-decoration: none;
 padding: 10px 20px;
 border-radius: 4px;
+font-family: 'Montserrat', sans-serif;
 font-weight: 700; /* Bold */
 
-/* Use the main accent color for the button */
-background-color: #4F4F4F; 
-color: #FFFFFF; /* White text on the dark button */
-border: 2px solid #4F4F4F; /* Solid border */
-
-/* Optional hover effect for modern feel */
-transition: background-color 0.3s, color 0.3s;
+/* Use a bright accent color for the button on the dark background */
+background-color: #E6B31E; /* A bright, industrial gold/yellow */ 
+color: #1A1A1A; /* Dark text on the bright button for high contrast */
+border: none;
+transition: background-color 0.3s;
 }
 
 a:hover {
-background-color: #333333; /* Slightly darker on hover */
-color: #FFFFFF;
+background-color: #FFC72C; /* Brighter on hover */
 }
+
 #main-logo-override {
     width: 450px !important;  /* Set the exact size you want */
     height: auto !important;  /* Keep the aspect ratio */
