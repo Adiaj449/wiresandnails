@@ -3,24 +3,26 @@ const session = require('express-session');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const pgSession = require('connect-pg-simple')(session); // CRITICAL: PostgreSQL session store
+const pgSession = require('connect-pg-simple')(session); 
 
 const app = express();
+
+// 🛑 CRITICAL FIX: Trust the Railway proxy to handle HTTPS/secure cookies 🛑
+app.set('trust proxy', 1); 
+
 // Use Railway's dynamic PORT environment variable, fallback to 3000 for local testing
 const port = process.env.PORT || 3000; 
 
 // ==============================================
-// 1. DATABASE CONFIGURATION (Using Environment Variables)
+// 1. DATABASE CONFIGURATION
 // ==============================================
 const pool = new Pool({
     // Retrieve credentials from Railway's environment variables
     user: process.env.DB_USER || 'postgres',
     host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
-    database: process.env.DB_NAME || 'railway', // Use your specific DB name
+    database: process.env.DB_NAME || 'railway', 
     password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
     port: process.env.DB_PORT || 52101,
-    
-    // Required for external connections (Node.js container to Railway DB)
     ssl: {
         rejectUnauthorized: false
     }
@@ -30,32 +32,24 @@ const pool = new Pool({
 // 2. MIDDLEWARE SETUP
 // ==============================================
 
-// Serve static files (index.html, CSS, etc.) from the root directory
 app.use(express.static(__dirname));
-
-// Parse incoming URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
-// Session Middleware Configuration (Using PostgreSQL for production safety)
+// Session Middleware Configuration (Includes all security fixes)
 app.use(session({
-    // Use the PostgreSQL store instead of the unsafe MemoryStore
     store: new pgSession({
-        pool: pool,          // Use the existing PostgreSQL connection pool
-        tableName: 'session' // The table where session data will be stored
+        pool: pool,          
+        tableName: 'session' 
     }),
-    // Load secret key from environment variable (MANDATORY for security)
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
     resave: false, 
     saveUninitialized: false,
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
-        httpOnly: true, // Prevents client-side JS access
+        httpOnly: true, 
         
-        // CRITICAL FINAL FIXES FOR RAILWAY/HTTPS:
-        // 1. 'secure: true' must be set when NODE_ENV is 'production' (HTTPS required)
+        // Final Security Settings: Must be true in production, paired with SameSite='None'
         secure: process.env.NODE_ENV === 'production',
-        
-        // 2. Set SameSite to 'None' for max compatibility, but only if 'secure' is true
         sameSite: process.env.NODE_ENV === 'production' ? 'None' : false 
     }
 }));
@@ -65,7 +59,6 @@ app.use(session({
 // 3. ROUTE HANDLERS
 // ==============================================
 
-// A. Home Page Route (Serves your index.html)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -79,31 +72,27 @@ app.post('/auth/login', async (req, res) => {
     }
 
     try {
-        // 1. Find User
         const result = await pool.query(
             'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
         );
         const user = result.rows[0];
 
-        // 2. User Not Found OR Password Mismatch
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-            // FAILED: Send a 401 response with a JSON error message
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        // 3. SUCCESS: Set Session Variables
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
         
-        // 4. CRITICAL FIX: Explicitly save the session to the database 
+        // Explicitly save the session
         req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
             }
             
-            // 5. SUCCESS: Send the JSON redirect instruction for the frontend to handle
+            // Send the JSON redirect instruction for the frontend
             return res.json({ 
                 success: true, 
                 redirectUrl: '/partner/dashboard' 
@@ -119,12 +108,10 @@ app.post('/auth/login', async (req, res) => {
 
 // C. PROTECTED DASHBOARD ROUTE
 app.get('/partner/dashboard', (req, res) => {
-    // Check if user has a valid session and the isPartner flag is true
+    // This check should now succeed because the session is being retrieved via trusted proxy.
     if (req.session.userId && req.session.isPartner) {
-        // Serves the partner-dashboard.html file
         res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // If not logged in or not authorized, redirect to home
         res.redirect('/');
     }
 });
@@ -137,7 +124,6 @@ app.post('/auth/logout', (req, res) => {
             console.error('Logout error:', err);
             return res.status(500).send('Could not log out.');
         }
-        // Redirect to the home page
         res.redirect('/');
     });
 });
