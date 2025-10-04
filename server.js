@@ -41,7 +41,7 @@ app.use(session({
     // Use the PostgreSQL store instead of the unsafe MemoryStore
     store: new pgSession({
         pool: pool,          // Use the existing PostgreSQL connection pool
-        tableName: 'session' // The table where session data will be stored (created automatically)
+        tableName: 'session' // The table where session data will be stored
     }),
     // Load secret key from environment variable (MANDATORY for security)
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// B. THE LOGIN POST ROUTE - NOW RETURNS JSON
+// B. THE LOGIN POST ROUTE - NOW RETURNS JSON FOR AJAX HANDLER
 app.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -105,7 +105,7 @@ app.post('/auth/login', async (req, res) => {
 });
 
 
-// C. PROTECTED DASHBOARD ROUTE
+// C. PROTECTED DASHBOARD ROUTE (The 302/redirect problem is fixed if session is persisted)
 app.get('/partner/dashboard', (req, res) => {
     // Check if user has a valid session and the isPartner flag is true
     if (req.session.userId && req.session.isPartner) {
