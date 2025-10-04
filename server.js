@@ -75,7 +75,8 @@ app.post('/auth/login', async (req, res) => {
     }
     try {
         const result = await pool.query(
-            'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
+            // Fetches is_admin status
+            'SELECT id, username, password_hash, is_partner, is_admin FROM users WHERE username = $1', 
             [username]
         );
         const user = result.rows[0];
@@ -88,6 +89,7 @@ app.post('/auth/login', async (req, res) => {
         // 2. Set session variables
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
+        req.session.isAdmin = user.is_admin; // <-- Stores admin status
         
         // 3. Save session and redirect
         req.session.save(err => {
@@ -95,6 +97,7 @@ app.post('/auth/login', async (req, res) => {
                 console.error('Session save error:', err);
                 return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
             }
+            // Admins can use the same dashboard link
             return res.json({ 
                 success: true, 
                 redirectUrl: '/partner/dashboard' 
@@ -110,20 +113,20 @@ app.post('/auth/login', async (req, res) => {
 
 // C. PROTECTED DASHBOARD ROUTE (GET) - EJS RENDER
 app.get('/partner/dashboard', async (req, res) => {
-    // Check if user is logged in AND is a partner
-    if (req.session.userId && req.session.isPartner) {
+    // Allows access if user is a partner OR an admin
+    if (req.session.userId && (req.session.isPartner || req.session.isAdmin)) {
         try {
-            // Fetch the username for display in the EJS template
             const userResult = await pool.query(
                 'SELECT username FROM users WHERE id = $1', 
                 [req.session.userId]
             );
             
-            const username = userResult.rows[0] ? userResult.rows[0].username : 'Partner';
+            const username = userResult.rows[0] ? userResult.rows[0].username : 'User';
 
-            // Render the EJS file and inject the username
+            // Render the EJS file and inject the username and isAdmin status
             res.render('partner-dashboard', { 
-                username: username 
+                username: username,
+                isAdmin: req.session.isAdmin || false
             });
 
         } catch (error) {
@@ -148,20 +151,52 @@ app.post('/auth/logout', (req, res) => {
     });
 });
 
-// E. API Route to FETCH ALL DEALERS for the logged-in partner (GET)
-// Retrieves a list of dealers associated with the current partner's userId.
+// E. API Route to FETCH ALL DEALERS (Admin-Only Access)
+app.get('/api/admin/all-dealers', async (req, res) => {
+    // CRITICAL: Check for Admin authorization 
+    if (!req.session.userId || !req.session.isAdmin) {
+        return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
+    }
+    
+    try {
+        // Fetch ALL records. Joins with 'users' to show which partner owns the dealer.
+        const result = await pool.query(
+            `SELECT
+                dn.id AS dealer_id,
+                u.username AS partner_username,
+                dn.company_name,
+                dn.contact_person,
+                dn.phone_number,
+                dn.gstin_number,
+                dn.address,
+                dn.updated_at
+             FROM dealer_network dn
+             JOIN users u ON dn.user_id = u.id
+             ORDER BY u.username, dn.company_name;`
+        );
+        
+        // Renames key to 'dealers' for seamless consumption by client JS
+        res.json({ success: true, dealers: result.rows }); 
+        
+    } catch (error) {
+        console.error('Error fetching all dealer data:', error);
+        res.status(500).json({ success: false, message: 'Database error fetching all dealer data.' });
+    }
+});
+
+
+// F. API Route to FETCH DEALERS for the logged-in partner (Standard Partner View)
 app.get('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     try {
         const result = await pool.query(
-            // NOTE: Using the 'dealer_network' table and selecting all records for this user
+            // Only selects records tied to the current user (req.session.userId)
             'SELECT id, company_name, contact_person, phone_number, gstin_number, address FROM dealer_network WHERE user_id = $1 ORDER BY company_name',
             [req.session.userId]
         );
         
-        // Return the full list (or an empty array)
         res.json({ success: true, dealers: result.rows });
         
     } catch (error) {
@@ -170,13 +205,12 @@ app.get('/api/dealers', async (req, res) => {
     }
 });
 
-// F. API Route to CREATE or UPDATE a Dealer (POST)
+// G. API Route to CREATE or UPDATE a Dealer (POST) - Used by both Admin and Partner
 app.post('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     
-    // dealerId is sent by the client if editing an existing dealer
     const { dealerId, companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
 
     if (!companyName || !phoneNumber) {
@@ -185,7 +219,7 @@ app.post('/api/dealers', async (req, res) => {
 
     try {
         if (dealerId) {
-            // EDIT MODE (UPDATE)
+            // EDIT MODE (UPDATE) - CRUCIAL: Must check that the record belongs to the user
             const updateResult = await pool.query(
                 `UPDATE dealer_network 
                  SET company_name = $1,
@@ -200,13 +234,14 @@ app.post('/api/dealers', async (req, res) => {
             );
 
             if (updateResult.rowCount === 0) {
+                 // Even if admin, if the UPDATE is run on this route, we only allow updating owned records
                  return res.status(404).json({ success: false, message: 'Dealer not found or unauthorized to edit.' });
             }
 
             res.json({ success: true, message: 'Dealer updated successfully!' });
 
         } else {
-            // CREATE MODE (INSERT)
+            // CREATE MODE (INSERT) - New dealer is always associated with the logged-in user
             await pool.query(
                 `INSERT INTO dealer_network (user_id, company_name, contact_person, phone_number, gstin_number, address) 
                  VALUES ($1, $2, $3, $4, $5, $6);`,
