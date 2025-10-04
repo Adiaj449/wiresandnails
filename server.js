@@ -6,40 +6,45 @@ const path = require('path');
 const pgSession = require('connect-pg-simple')(session); 
 
 const app = express();
-const port = process.env.PORT || 3000; 
 
 // CRITICAL FIX FOR RAILWAY/PROXY: Trust the proxy headers for secure cookies
 app.set('trust proxy', 1); 
+
+// 🛑 EJS CONFIGURATION 🛑
 app.set('views', __dirname); 
 app.set('view engine', 'ejs'); 
+
+const port = process.env.PORT || 3000; 
 
 // ==============================================
 // 1. DATABASE CONFIGURATION
 // ==============================================
-// Using process.env is highly recommended for credentials
+// Connects to the PostgreSQL database using environment variables
 const pool = new Pool({
     user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'mydatabase',
-    password: process.env.DB_PASSWORD || 'mypassword',
-    port: process.env.DB_PORT || 5432,
+    host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
+    database: process.env.DB_NAME || 'railway',
+    password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
+    port: process.env.DB_PORT || 52101,
     ssl: {
-        rejectUnauthorized: false // Adjust as per your hosting environment (e.g., needed for Railway)
+        rejectUnauthorized: false // Required for platforms like Railway with self-signed certs
     }
 });
 
 // ==============================================
 // 2. MIDDLEWARE SETUP
 // ==============================================
+
+// Serve static files (like CSS, images, client-side JS)
 app.use(express.static(__dirname));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Handle form submissions
+app.use(express.json()); // Handle JSON payloads for API routes
 
 // Session Middleware Configuration
 app.use(session({
     store: new pgSession({
         pool: pool,          
-        tableName: 'session'
+        tableName: 'session' // Must match the table created in your database
     }),
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
     resave: false, 
@@ -47,8 +52,8 @@ app.use(session({
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false // Required for cross-site access in production
     }
 }));
 
@@ -70,27 +75,30 @@ app.post('/auth/login', async (req, res) => {
     }
     try {
         const result = await pool.query(
-            // Fetches is_admin status
-            'SELECT id, username, password_hash, is_partner, is_admin FROM users WHERE username = $1', 
+            'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
         );
         const user = result.rows[0];
         
+        // 1. Check if user exists and if password is correct
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
             return res.status(401).json({ success: false, message: 'Invalid credentials. Please try again.' });
         }
 
-        // Set session variables, including isAdmin
+        // 2. Set session variables
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
-        req.session.isAdmin = user.is_admin;
         
+        // 3. Save session and redirect
         req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
             }
-            return res.json({ success: true, redirectUrl: '/partner/dashboard' });
+            return res.json({ 
+                success: true, 
+                redirectUrl: '/partner/dashboard' 
+            });
         });
 
     } catch (error) {
@@ -102,19 +110,20 @@ app.post('/auth/login', async (req, res) => {
 
 // C. PROTECTED DASHBOARD ROUTE (GET) - EJS RENDER
 app.get('/partner/dashboard', async (req, res) => {
-    if (req.session.userId && (req.session.isPartner || req.session.isAdmin)) {
+    // Check if user is logged in AND is a partner
+    if (req.session.userId && req.session.isPartner) {
         try {
+            // Fetch the username for display in the EJS template
             const userResult = await pool.query(
                 'SELECT username FROM users WHERE id = $1', 
                 [req.session.userId]
             );
             
-            const username = userResult.rows[0] ? userResult.rows[0].username : 'User';
+            const username = userResult.rows[0] ? userResult.rows[0].username : 'Partner';
 
-            // Pass isAdmin status to the EJS template
+            // Render the EJS file and inject the username
             res.render('partner-dashboard', { 
-                username: username,
-                isAdmin: req.session.isAdmin || false
+                username: username 
             });
 
         } catch (error) {
@@ -122,6 +131,7 @@ app.get('/partner/dashboard', async (req, res) => {
             res.redirect('/');
         }
     } else {
+        // Not authorized or not logged in
         res.redirect('/');
     }
 });
@@ -138,104 +148,69 @@ app.post('/auth/logout', (req, res) => {
     });
 });
 
-// ----------------------------------------------------
-// E. API Route to FETCH ALL DEALERS (ADMIN-ONLY) 
-// ----------------------------------------------------
-app.get('/api/admin/all-dealers', async (req, res) => {
-    if (!req.session.userId || !req.session.isAdmin) {
-        return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
-    }
-    
-    try {
-        // Fetch ALL records and join with users to get the partner's username
-        const result = await pool.query(
-            `SELECT
-                dn.id AS dealer_id,
-                u.username AS partner_username,
-                dn.company_name,
-                dn.contact_person,
-                dn.phone_number,
-                dn.gstin_number,
-                dn.address,
-                dn.updated_at
-             FROM dealer_network dn
-             JOIN users u ON dn.user_id = u.id
-             ORDER BY u.username, dn.company_name;`
-        );
-        
-        // Use 'dealers' key for client-side consumption
-        res.json({ success: true, dealers: result.rows }); 
-        
-    } catch (error) {
-        console.error('Error fetching all dealer data:', error);
-        res.status(500).json({ success: false, message: 'Database error fetching all dealer data.' });
-    }
-});
-// ----------------------------------------------------
-
-// F. API Route to FETCH DEALERS (STANDARD PARTNER)
-app.get('/api/dealers', async (req, res) => {
+// E. API Route to FETCH Dealer Details (GET)
+app.get('/api/dealer-details', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     try {
         const result = await pool.query(
-            // CRITICAL: Filters by the logged-in user's ID
-            'SELECT id, company_name, contact_person, phone_number, gstin_number, address FROM dealer_network WHERE user_id = $1 ORDER BY company_name',
+            'SELECT company_name, contact_person, phone_number, gstin_number, address FROM dealer_details WHERE user_id = $1',
             [req.session.userId]
         );
         
-        res.json({ success: true, dealers: result.rows });
-        
+        if (result.rows.length > 0) {
+            // Send back the single record
+            res.json({ success: true, details: result.rows[0] });
+        } else {
+            // Success, but no details found (user hasn't set them yet)
+            res.json({ success: false, message: 'No details found.' });
+        }
     } catch (error) {
-        console.error('Error fetching dealer list:', error);
-        res.status(500).json({ success: false, message: 'Database error fetching dealer network.' });
+        console.error('Error fetching dealer details:', error);
+        res.status(500).json({ success: false, message: 'Database error fetching details.' });
     }
 });
 
-// G. API Route to CREATE or UPDATE a Dealer (POST)
-app.post('/api/dealers', async (req, res) => {
+// F. API Route to SAVE/UPDATE Dealer Details (POST - UPSERT)
+app.post('/api/dealer-details', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     
-    const { dealerId, companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
+    // Data validation 
+    const { companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
 
     if (!companyName || !phoneNumber) {
         return res.status(400).json({ success: false, message: 'Company Name and Phone Number are required fields.' });
     }
 
     try {
-        if (dealerId) {
-            // EDIT MODE (UPDATE) - MUST check user_id for security
-            const updateResult = await pool.query(
-                `UPDATE dealer_network 
-                 SET company_name = $1, contact_person = $2, phone_number = $3, gstin_number = $4, address = $5, updated_at = CURRENT_TIMESTAMP
-                 WHERE id = $6 AND user_id = $7
-                 RETURNING id;`,
-                [companyName, contactPerson, phoneNumber, gstinNumber, address, dealerId, req.session.userId]
-            );
+        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature
+        const result = await pool.query(
+            `INSERT INTO dealer_details (user_id, company_name, contact_person, phone_number, gstin_number, address) 
+             VALUES ($1, $2, $3, $4, $5, $6)
+             ON CONFLICT (user_id) DO UPDATE
+             SET company_name = EXCLUDED.company_name,
+                 contact_person = EXCLUDED.contact_person,
+                 phone_number = EXCLUDED.phone_number,
+                 gstin_number = EXCLUDED.gstin_number,
+                 address = EXCLUDED.address,
+                 updated_at = CURRENT_TIMESTAMP
+             RETURNING company_name, contact_person, phone_number, gstin_number, address;`,
+            [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
+        );
 
-            if (updateResult.rowCount === 0) {
-                 return res.status(404).json({ success: false, message: 'Dealer not found or unauthorized to edit.' });
-            }
-
-            res.json({ success: true, message: 'Dealer updated successfully!' });
-
-        } else {
-            // CREATE MODE (INSERT)
-            await pool.query(
-                `INSERT INTO dealer_network (user_id, company_name, contact_person, phone_number, gstin_number, address) 
-                 VALUES ($1, $2, $3, $4, $5, $6);`,
-                [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
-            );
-
-            res.json({ success: true, message: 'New dealer created successfully!' });
-        }
+        res.json({ 
+            success: true, 
+            message: 'Dealer details saved successfully.',
+            // Return the saved details to update the client-side state immediately
+            details: result.rows[0]
+        });
         
     } catch (error) {
-        console.error('Error saving dealer:', error);
-        res.status(500).json({ success: false, message: 'Database error saving dealer.' });
+        console.error('Error saving dealer details:', error);
+        res.status(500).json({ success: false, message: 'Database error saving details.' });
     }
 });
 
@@ -245,4 +220,5 @@ app.post('/api/dealers', async (req, res) => {
 // ==============================================
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log(`Node environment: ${process.env.NODE_ENV || 'development'}`);
 });

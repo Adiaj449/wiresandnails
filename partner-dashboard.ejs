@@ -5,52 +5,298 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
+    <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        body { background-color: #f4f7f6; padding-top: 0; font-family: 'Roboto Condensed', sans-serif; }
-        .dashboard-header { background-color: #ffffff; color: #1a237e; padding: 20px 0; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 40px; }
-        .dashboard-header .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .dashboard-header h1 { color: #1a237e; margin: 0; font-size: 1.8em; font-weight: 700; }
-        .user-info { text-align: right; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .logout-form button { background-color: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 700; transition: background-color 0.3s; }
-        .logout-form button:hover { background-color: #b71c1c; }
-        .dashboard-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .dashboard-card { background: white; padding: 25px; border-left: 5px solid #ff9800; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); text-align: left; position: relative; }
-        .dashboard-card h3 { color: #1a237e; margin-top: 0; font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .dealer-details-form { padding: 10px 0; }
-        .dealer-details-form label { display: block; margin-top: 10px; font-weight: 700; color: #1a237e; }
-        .dealer-details-form input, .dealer-details-form textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
-        .form-action-buttons { margin-top: 20px; }
-        .form-action-buttons button { padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px; cursor: pointer; font-weight: 700; transition: background-color 0.2s; }
-        .form-action-buttons .save-btn { background-color: #4caf50; color: white; }
-        .form-action-buttons .cancel-btn { background-color: #f4f4f4; color: #333; }
-        .message-box { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; font-weight: 700; }
-        .message-box.success { background-color: #e8f5e9; color: #388e3c; }
-        .message-box.error { background-color: #ffebee; color: #d32f2f; }
-        .message-box.loading { background-color: #e3f2fd; color: #2196f3; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 0.9em; text-align: left; }
-        .data-table th, .data-table td { padding: 12px 15px; border-bottom: 1px solid #eee; }
-        .data-table thead tr { background-color: #e3f2fd; color: #1a237e; text-transform: uppercase; font-weight: 700; }
-        .data-table tbody tr:hover { background-color: #f9f9f9; }
-        .dealer-action-btn { background: none; border: none; color: #1a237e; cursor: pointer; padding: 4px; font-size: 1.1em; transition: color 0.2s; }
-        .dealer-action-btn:hover { color: #ff9800; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; }
-        .section-header h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+        /* DASHBOARD SPECIFIC STYLES */
+        body {
+            background-color: #f4f7f6; 
+            padding-top: 0;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+        .dashboard-header {
+            background-color: #ffffff;
+            color: #1a237e;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .dashboard-header .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .dashboard-header .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .dashboard-header .logo-container img {
+            height: 40px; 
+            margin-right: 15px;
+        }
+        .dashboard-header h1 {
+            color: #1a237e; 
+            margin: 0;
+            font-size: 1.8em; 
+            font-weight: 700;
+        }
+        .user-info {
+            text-align: right;
+            margin-left: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        .user-info .user-id-text {
+            font-size: 0.8em;
+            color: #666;
+            word-break: break-all;
+            max-width: 250px;
+        }
+        .logout-form button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s;
+        }
+        .logout-form button:hover {
+            background-color: #b71c1c;
+        }
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-left: 5px solid #ff9800;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            position: relative; 
+        }
+        .dashboard-card h3 {
+            color: #1a237e;
+            margin-top: 0;
+            font-size: 1.5em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .dashboard-card ul li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ddd;
+            font-size: 1em;
+            display: flex;
+            justify-content: space-between;
+        }
+        .dashboard-card ul li:last-child {
+            border-bottom: none;
+        }
+        .download-link {
+            display: block;
+            margin-top: 15px;
+            text-align: right;
+            color: #ff9800;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* Dealer Details / Management Styles */
+        .dealer-details-form {
+            padding: 10px 0;
+        }
+        
+        .dealer-details-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        .dealer-details-form input, .dealer-details-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box; 
+        }
+
+        .form-action-buttons {
+            margin-top: 20px;
+        }
+        .form-action-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+
+        .form-action-buttons .save-btn {
+            background-color: #4caf50; 
+            color: white;
+        }
+        .form-action-buttons .cancel-btn {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .form-action-buttons .save-btn:hover { background-color: #388e3c; }
+        .form-action-buttons .cancel-btn:hover { background-color: #ddd; }
+
+
+        .message-box {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 700;
+        }
+        .message-box.success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        .message-box.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        .message-box.loading {
+            background-color: #e3f2fd;
+            color: #2196f3;
+        }
+
+        /* TABLE STYLES for Readability (used for both sections) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table thead tr {
+            background-color: #e3f2fd; /* Light blue header */
+            color: #1a237e;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        .status-badge.pending {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+        .status-badge.shipped {
+            background-color: #e3f2fd;
+            color: #2196f3;
+        }
+        .status-badge.delivered {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+
+        /* NEW: Dealer List Action Button */
+        .dealer-action-btn {
+            background: none;
+            border: none;
+            color: #1a237e;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1.1em;
+            transition: color 0.2s;
+        }
+        .dealer-action-btn:hover {
+            color: #ff9800;
+        }
+        
+        /* New section header style for better button placement */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-header h3 {
+             border-bottom: none;
+             padding-bottom: 0;
+             margin-bottom: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .dashboard-header .logo-container {
+                margin-bottom: 10px;
+            }
+            .user-info {
+                align-items: center;
+                text-align: center;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <header class="dashboard-header">
         <div class="header-content">
             <div class="logo-container">
+                <img 
+                    src="/Images/logo_wires.png" 
+                    alt="Shree JMTS Wires & Nails Logo" 
+                    class="logo-wires"
+                >
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
             <div class="user-info">
-                <p style="margin: 0; font-weight: 700; color: #1a237e;">
-                    Role: <%= isAdmin ? 'Admin' : 'Partner' %>
-                </p>
+                <p style="margin: 0; font-weight: 700; color: #1a237e;">Your User ID:</p>
+                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Authentication Success</code> 
                 <div class="logout-form">
                     <form action="/auth/logout" method="POST">
                         <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
@@ -62,27 +308,39 @@
 
     <div class="dashboard-content">
         
-        <section class="dashboard-card" id="dealerManagementCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
-            <div class="section-header">
-                 <h3 id="dealerCardTitle"><i class="fa-solid fa-users-gear"></i> Manage Dealer Network</h3>
-                 <button 
-                    class="edit-toggle-btn" 
-                    id="addDealerButton" 
-                    onclick="openDealerForm(null)" 
-                    style="border-color: #4caf50; color: #4caf50;"
-                >
-                    <i class="fa-solid fa-plus"></i> Add New Dealer
-                </button>
+        <section class="dashboard-grid">
+            <div class="dashboard-card" style="border-left-color: #4caf50;">
+                <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
+                <p style="font-size: 2.5em; color: #4caf50; margin: 0;">03</p>
+                <a href="#transactionHistory" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
-
-            <div id="dealerListDisplay" style="margin-top: 15px;">
-                <p id="loadingMessage" class="message-box loading" style="display: block;">Loading dealers...</p>
+            
+            <div class="dashboard-card" style="border-left-color: #2196f3;">
+                <h3><i class="fa-solid fa-warehouse"></i> Inventory Stock</h3>
+                <p style="font-size: 2.5em; color: #2196f3; margin: 0;">240 MT</p>
+                <a href="#" class="download-link">Check Stock Levels <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="dashboard-card" style="border-left-color: #ff5722;">
+                <h3><i class="fa-solid fa-sack-dollar"></i> Current Rate Index</h3>
+                <p style="font-size: 2.5em; color: #ff5722; margin: 0;">₹45,500/MT</p>
+                <a href="#pricing" class="download-link">Full Price List <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </section>
 
+        <section class="dashboard-card" id="myDetailsCard" style="border-left-color: #ff5722; margin-bottom: 40px;">
+            <div class="section-header">
+                 <h3><i class="fa-solid fa-address-card"></i> My Primary Dealer Details </h3>
+                 </div>
+            <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
+
+            <div id="myDetailsDisplay" style="margin-top: 15px;">
+                <p style="color: #2196f3; text-align: center;">Loading your details...</p>
+                </div>
+        </section>
+
         <section class="dashboard-card" id="dealerFormCard" style="border-left-color: #ff9800; display: none;">
-            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Add New Dealer</h3>
+            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Set/Edit My Primary Details</h3>
 
             <form id="detailsForm" class="dealer-details-form">
                 <label for="companyName">Company Name <span style="color:red;">*</span></label>
@@ -108,27 +366,124 @@
                 </div>
             </form>
         </section>
+        <section class="dashboard-card" id="transactionHistory" style="border-left-color: #00bcd4; margin-bottom: 40px;">
+            <h3><i class="fa-solid fa-list-check"></i> Recent Transaction History</h3>
+            <div class="data-table-container">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <input type="text" placeholder="Search by Order ID or Product..." style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    <select style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Filter by Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Quantity (MT)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#JMTS1008</td>
+                            <td>2025-10-01</td>
+                            <td>HB Wire (8G)</td>
+                            <td>10.0</td>
+                            <td><span class="status-badge shipped">Shipped</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1007</td>
+                            <td>2025-09-28</td>
+                            <td>MS Wire Nails</td>
+                            <td>5.5</td>
+                            <td><span class="status-badge delivered">Delivered</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1006</td>
+                            <td>2025-09-25</td>
+                            <td>MS Wire (10G)</td>
+                            <td>12.0</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#JMTS1005</td>
+                            <td>2025-09-20</td>
+                            <td>HB Wire (8G)</td>
+                            <td>8.0</td>
+                            <td><span class="status-badge delivered">Delivered</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="text-align: right; margin-top: 15px; font-size: 0.9em; color: #666;">
+                    Showing 1 - 4 of 24 Total Transactions. <a href="#" style="color: #00bcd4; text-decoration: none; font-weight: 700;">View All →</a>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
+            <h3><i class="fa-solid fa-tags"></i> Exclusive Partner Pricing (Current Rates)</h3>
+            <ul>
+                <li>
+                    <span>HB Wire (8 Gauge)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹46,500 / MT</span>
+                </li>
+                <li>
+                    <span>MS Wire (10 Gauge)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹45,900 / MT</span>
+                </li>
+                <li>
+                    <span>MS Wire Nails (All Sizes)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹48,100 / MT</span>
+                </li>
+                <li>
+                    <span>BOPP Tape (Bulk)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹750 / Roll</span>
+                </li>
+            </ul>
+            <a href="#" class="download-link"><i class="fa-solid fa-download"></i> Download Full Pricelist PDF</a>
+        </section>
+
+        <section class="dashboard-card" style="border-left-color: #607d8b;">
+            <h3><i class="fa-solid fa-file-pdf"></i> Distributor Resources & Downloads</h3>
+            <ul>
+                <li>
+                    <span>Product Catalog (Q4 2025)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+                <li>
+                    <span>Quality Assurance Certificate (ISO)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+                <li>
+                    <span>New Product Launch Guide (MS Mesh)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+            </ul>
+        </section>
         
     </div>
     
     <script>
-        // EJS INJECTION: Set a global variable based on server-side status
-        const IS_ADMIN = <%= isAdmin %>; 
-        const CURRENT_USERNAME = '<%= username %>';
-
         // State and DOM elements
-        let dealerList = []; 
-        let editingDealerId = null; 
-
-        const dealerListDisplay = document.getElementById('dealerListDisplay');
+        let currentDealerDetails = {}; // Stores the single record fetched from the server
+        
+        // Get the new display element and existing form elements
+        const myDetailsDisplay = document.getElementById('myDetailsDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
         const detailsForm = document.getElementById('detailsForm');
         const formTitle = document.getElementById('formTitle');
         const formMessage = document.getElementById('formMessage');
-        const loadingMessage = document.getElementById('loadingMessage');
-        const dealerManagementCard = document.getElementById('dealerManagementCard'); 
-        const dealerCardTitle = document.getElementById('dealerCardTitle');
-        
+
         // --- UI UTILITIES ---
         
         function showMessage(type, message) {
@@ -139,155 +494,107 @@
                 formMessage.style.display = 'none';
             }, 5000);
         }
-
-        // --- RENDERING LIST VIEW (Updated for Admin) ---
-        function renderDealerList() {
-            if (dealerList.length === 0) {
-                const message = IS_ADMIN 
-                    ? '<p style="text-align: center; color: #8e24aa; font-style: italic;">The Master Dealer Network is empty.</p>'
-                    : '<p style="text-align: center; color: #8e24aa; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
-                dealerListDisplay.innerHTML = message;
-                return;
-            }
-            
-            // Update the card title with count
-            dealerCardTitle.innerHTML = IS_ADMIN
-                ? `<i class="fa-solid fa-users-gear"></i> **MASTER** Dealer Network (${dealerList.length} Total)`
-                : `<i class="fa-solid fa-users-gear"></i> Manage Dealer Network (${dealerList.length} Dealers)`;
-
-
-            let tableHTML = `
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                ${IS_ADMIN ? '<th>Partner</th>' : ''} <th>Company Name</th>
-                                <th>Contact Person</th>
-                                <th>Phone</th>
-                                <th>GSTIN</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            dealerList.forEach(dealer => {
-                const companyName = dealer.company_name || 'N/A';
-                const contactPerson = dealer.contact_person || 'N/A';
-                const phoneNumber = dealer.phone_number || 'N/A';
-                const gstinNumber = dealer.gstin_number || 'N/A';
-                
-                // Determine if the current user owns the dealer (to enable editing)
-                // Admin can only edit their own records via this simple UI.
-                const isOwner = !IS_ADMIN || dealer.partner_username === CURRENT_USERNAME;
-                const dealerIdToUse = dealer.id || dealer.dealer_id;
-
-                tableHTML += `
-                    <tr>
-                        ${IS_ADMIN ? `<td><i class="fa-solid fa-user-tag"></i> ${dealer.partner_username || 'N/A'}</td>` : ''}
-                        <td>${companyName}</td>
-                        <td>${contactPerson}</td>
-                        <td>${phoneNumber}</td>
-                        <td>${gstinNumber}</td>
-                        <td style="text-align: center;">
-                            ${isOwner 
-                                ? `<button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealerIdToUse}')">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                   </button>`
-                                : `<span style="color: #ccc;" title="Cannot edit other partner's records in this view"><i class="fa-solid fa-lock"></i></span>`
-                            }
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            dealerListDisplay.innerHTML = tableHTML;
-        }
         
-        // --- API CALL: FETCH DEALER LIST (Modified for Admin) ---
-        async function loadDealerNetwork() {
-            loadingMessage.style.display = 'block';
-            dealerListDisplay.innerHTML = ''; 
-
-            // Conditional API endpoint based on Admin status
-            const apiEndpoint = IS_ADMIN ? '/api/admin/all-dealers' : '/api/dealers';
-            
-            // If Admin, hide the "Add New Dealer" button as the current form only adds for the current user
-            if (IS_ADMIN) {
-                 document.getElementById('addDealerButton').style.display = 'none';
+        // --- FUNCTION: Renders the single dealer details record ---
+        function renderMyDetails() {
+            if (Object.keys(currentDealerDetails).length === 0) {
+                // Case: No details found for this user
+                myDetailsDisplay.innerHTML = `
+                    <p style="text-align: center; color: #ff5722; font-style: italic; margin-bottom: 20px;">
+                        Your primary dealer details are not set. Click the button to save them.
+                    </p>
+                    <button 
+                        class="edit-toggle-btn" 
+                        onclick="openDealerForm()" 
+                        style="border-color: #ff9800; color: #ff9800; display: block; margin: 0 auto; padding: 10px 20px;"
+                    >
+                        <i class="fa-solid fa-address-card"></i> Set My Details Now
+                    </button>
+                `;
+            } else {
+                // Case: Details found, display them
+                const d = currentDealerDetails;
+                myDetailsDisplay.innerHTML = `
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" style="margin-bottom: 20px; font-size: 1em;">
+                            <tbody>
+                                <tr><th style="width: 30%; background-color: #f7f7f7;">Company Name</th><td>${d.company_name || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Contact Person</th><td>${d.contact_person || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Phone Number</th><td>${d.phone_number || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">GSTIN / Tax ID</th><td>${d.gstin_number || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Address</th><td>${d.address ? d.address.replace(/\n/g, '<br>') : 'N/A'}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button 
+                        class="edit-toggle-btn" 
+                        onclick="openDealerForm()" 
+                        style="border-color: #2196f3; color: #2196f3; display: block; margin-left: auto; padding: 8px 15px;"
+                    >
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                    </button>
+                `;
             }
+        }
 
+
+        // --- FUNCTION: Fetches the single dealer details record from Express API ---
+        async function loadDealerDetails() {
+            myDetailsDisplay.innerHTML = '<p style="color: #2196f3; text-align: center;">Loading your details...</p>';
             try {
-                const response = await fetch(apiEndpoint);
+                // Use the Express GET API route
+                const response = await fetch('/api/dealer-details');
                 const data = await response.json();
                 
-                if (response.ok && data.success) {
-                    dealerList = data.dealers; 
-                    renderDealerList();
+                if (response.ok && data.success && data.details) {
+                    currentDealerDetails = data.details;
                 } else {
-                    dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Failed to load dealer network.</p>';
+                    currentDealerDetails = {}; // Details not set yet or unauthorized
                 }
+                renderMyDetails();
+                
             } catch (error) {
-                console.error("Error fetching dealer network:", error);
-                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Server connection error while loading dealers.</p>';
-            } finally {
-                loadingMessage.style.display = 'none';
+                console.error("Error loading dealer details:", error);
+                myDetailsDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f;">Failed to load details due to server error.</p>';
             }
         }
+        
 
+        // --- UI & FORM LOGIC (Exposed to Global Scope for HTML onClick) ---
 
-        // --- UI & FORM LOGIC ---
-
-        window.openDealerForm = function(dealerId = null) {
+        window.openDealerForm = function() {
             detailsForm.reset();
             formMessage.style.display = 'none';
-            
-            editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
-            if (editingDealerId) {
-                // Find dealer by 'id' (partner view) or 'dealer_id' (admin view)
-                const dealer = dealerList.find(d => d.id == editingDealerId || d.dealer_id == editingDealerId);
-                if (!dealer) return; 
-                
-                // Security check: Only allow editing if the user is the owner
-                if (IS_ADMIN && dealer.partner_username && dealer.partner_username !== CURRENT_USERNAME) {
-                    alert('Error: You can only edit your own dealer records using this form, even as an Admin.');
-                    return; 
-                }
-
-                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
-                
-                document.getElementById('companyName').value = dealer.company_name || '';
-                document.getElementById('contactPerson').value = dealer.contact_person || '';
-                document.getElementById('phoneNumber').value = dealer.phone_number || '';
-                document.getElementById('gstinNumber').value = dealer.gstin_number || '';
-                document.getElementById('address').value = dealer.address || '';
-
+            // Set form title and populate fields based on current state
+            if (Object.keys(currentDealerDetails).length > 0) {
+                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit My Dealer Details`;
+                // Populate the form fields
+                document.getElementById('companyName').value = currentDealerDetails.company_name || '';
+                document.getElementById('contactPerson').value = currentDealerDetails.contact_person || '';
+                document.getElementById('phoneNumber').value = currentDealerDetails.phone_number || '';
+                document.getElementById('gstinNumber').value = currentDealerDetails.gstin_number || '';
+                document.getElementById('address').value = currentDealerDetails.address || '';
             } else {
-                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Add New Dealer`;
+                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Set My Primary Dealer Details`;
             }
 
-            dealerManagementCard.style.display = 'none';
+            // Toggle UI visibility
+            document.getElementById('myDetailsCard').style.display = 'none';
             dealerFormCard.style.display = 'block';
         }
         
         window.closeDealerForm = function() {
-            editingDealerId = null;
             dealerFormCard.style.display = 'none';
-            dealerManagementCard.style.display = 'block';
+            document.getElementById('myDetailsCard').style.display = 'block';
         }
         
         // --- FORM SUBMISSION HANDLER ---
+        
         detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = {
-                dealerId: editingDealerId, 
                 companyName: document.getElementById('companyName').value.trim(),
                 contactPerson: document.getElementById('contactPerson').value.trim(),
                 phoneNumber: document.getElementById('phoneNumber').value.trim(),
@@ -295,18 +602,21 @@
                 address: document.getElementById('address').value.trim(),
             };
 
+            // Basic client-side validation for required fields
             if (!formData.companyName || !formData.phoneNumber) {
                 showMessage('error', 'Company Name and Phone Number are required fields.');
                 return;
             }
 
-            showMessage('loading', 'Saving dealer details...');
+            showMessage('loading', 'Saving details...');
             
             try {
-                // Uses the standard POST route for create/update
-                const response = await fetch('/api/dealers', {
+                // Use POST to the UPSERT API route
+                const response = await fetch('/api/dealer-details', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json' 
+                    },
                     body: JSON.stringify(formData)
                 });
                 
@@ -314,20 +624,22 @@
 
                 if (data.success) {
                     showMessage('success', data.message);
-                    await loadDealerNetwork(); 
-                    closeDealerForm(); 
+                    // Update local state and trigger a re-render from the saved data
+                    currentDealerDetails = data.details;
+                    renderMyDetails(); 
+                    closeDealerForm();
                 } else {
-                    showMessage('error', data.message || 'Failed to save dealer.');
+                    showMessage('error', data.message || 'Failed to save details. Try again.');
                 }
                 
             } catch (error) {
                 console.error("Error saving dealer:", error);
-                showMessage('error', `Failed to save dealer: Server connection error.`);
+                showMessage('error', `Failed to save details: Server connection error.`);
             }
         });
 
-        // Start the application by loading the dealer network list
-        window.onload = loadDealerNetwork;
+        // Start the application by loading dealer details
+        window.onload = loadDealerDetails;
         
     </script>
 </body>
