@@ -3,10 +3,10 @@ const session = require('express-session');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const pgSession = require('connect-pg-simple')(session); // NEW: PostgreSQL session store
+const pgSession = require('connect-pg-simple')(session); // CRITICAL: PostgreSQL session store
 
 const app = express();
-// Railway requires listening on the PORT environment variable
+// Use Railway's dynamic PORT environment variable, fallback to 3000 for local testing
 const port = process.env.PORT || 3000; 
 
 // ==============================================
@@ -30,18 +30,18 @@ const pool = new Pool({
 // 2. MIDDLEWARE SETUP
 // ==============================================
 
-// For serving static files (CSS, Images, Video) from the root directory
+// Serve static files (index.html, CSS, etc.) from the root directory
 app.use(express.static(__dirname));
 
-// To parse form data (the username and password)
+// Parse incoming URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
 // Session Middleware Configuration (Using PostgreSQL for production safety)
 app.use(session({
-    // CRITICAL FIX: Use the PostgreSQL store instead of MemoryStore
+    // Use the PostgreSQL store instead of the unsafe MemoryStore
     store: new pgSession({
         pool: pool,          // Use the existing PostgreSQL connection pool
-        tableName: 'session' // The table where session data will be stored
+        tableName: 'session' // The table where session data will be stored (created automatically)
     }),
     // Load secret key from environment variable (MANDATORY for security)
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
@@ -74,7 +74,7 @@ app.post('/auth/login', async (req, res) => {
     }
 
     try {
-        // Find User
+        // 1. Find User
         const result = await pool.query(
             'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
@@ -82,17 +82,17 @@ app.post('/auth/login', async (req, res) => {
 
         const user = result.rows[0];
 
-        // 3. User Not Found OR 4. Verify Password
+        // 2. User Not Found OR Password Mismatch
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
             // FAILED: Redirect back to home with an error parameter
             return res.redirect('/?loginError=InvalidCredentials');
         }
 
-        // 5. SUCCESS: Create Session
+        // 3. SUCCESS: Create Session
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
         
-        // 6. Redirect to Protected Area
+        // 4. Redirect to Protected Area
         return res.redirect('/partner/dashboard');
 
     } catch (error) {
@@ -106,10 +106,10 @@ app.post('/auth/login', async (req, res) => {
 app.get('/partner/dashboard', (req, res) => {
     // Check if user has a valid session and the isPartner flag is true
     if (req.session.userId && req.session.isPartner) {
-        // Serves the actual HTML file you created in your project
+        // Serves the partner-dashboard.html file
         res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // If not logged in or not authorized
+        // If not logged in or not authorized, redirect to home
         res.redirect('/');
     }
 });
@@ -122,7 +122,7 @@ app.post('/auth/logout', (req, res) => {
             console.error('Logout error:', err);
             return res.status(500).send('Could not log out.');
         }
-        // Redirect to the home page (login modal)
+        // Redirect to the home page
         res.redirect('/');
     });
 });
