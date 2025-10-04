@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
-    <!-- Link to your main stylesheet for consistent styling -->
     <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -47,8 +46,19 @@
             font-size: 1.8em; 
             font-weight: 700;
         }
-        .logout-form {
+        .user-info {
+            text-align: right;
             margin-left: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        .user-info .user-id-text {
+            font-size: 0.8em;
+            color: #666;
+            word-break: break-all;
+            max-width: 250px;
         }
         .logout-form button {
             background-color: #d32f2f;
@@ -255,6 +265,21 @@
              padding-bottom: 0;
              margin-bottom: 0;
         }
+        
+        @media (max-width: 768px) {
+            .dashboard-header .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .dashboard-header .logo-container {
+                margin-bottom: 10px;
+            }
+            .user-info {
+                align-items: center;
+                text-align: center;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -270,10 +295,14 @@
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
-            <div class="logout-form">
-                <form action="/auth/logout" method="POST">
-                    <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
-                </form>
+            <div class="user-info">
+                <p style="margin: 0; font-weight: 700; color: #1a237e;">Your User ID:</p>
+                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Loading...</code>
+                <div class="logout-form">
+                    <form action="/auth/logout" method="POST">
+                        <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -318,7 +347,7 @@
 
             <!-- Dealer List Display Area -->
             <div id="dealerListDisplay" style="margin-top: 15px;">
-                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Connecting to database and loading dealer list...</p>
+                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Loading dealers in real-time...</p>
                 <!-- Table will be injected here by JavaScript -->
             </div>
         </section>
@@ -466,111 +495,38 @@
         
     </div>
     
-    <!-- CONSOLIDATED JAVASCRIPT & FIREBASE LOGIC -->
+    <!-- FIREBASE IMPORTS (REQUIRED) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // Removed Auth imports as we are bypassing auth
-        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // --- MOCK FALLBACK CONFIGURATION (To allow Firebase initialization) ---
-        // Using a generic config to prevent the key format error
-        const FALLBACK_FIREBASE_CONFIG = {
-            apiKey: "AIzaSy_M0CK_KEY_F0R_DEM0", 
-            authDomain: "mock-project-1234.firebaseapp.com",
-            projectId: "mock-project-1234",
-            storageBucket: "mock-project-1234.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:mocked"
-        };
-        const FORCED_USER_ID = "DEMO_PARTNER_001"; 
-        // --- END MOCK CONFIG ---
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, setDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-
-        // --- GLOBAL STATE VARIABLES ---
-        setLogLevel('Debug'); 
-        
-        // Safely access global variables, falling back to mocks if undefined
+        // Global environment variables provided by the Canvas hosting environment
+        // The ternary operator handles cases where the variables might not be defined during initial testing.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        let firebaseConfig = {};
-        try {
-             // Use the provided config if available, otherwise use the fallback
-             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '' ? __firebase_config : JSON.stringify(FALLBACK_FIREBASE_CONFIG));
-        } catch (e) {
-            console.error("Critical Error: Failed to parse __firebase_config string. Using fallback config.", e);
-            firebaseConfig = FALLBACK_FIREBASE_CONFIG;
-        }
-        
-        let db = null;
-        let userId = FORCED_USER_ID; // FORCING the userId to bypass failing Auth step
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase variables
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let dealersCollectionRef = null; 
+
+        // State and DOM elements
         let dealerList = []; 
         let editingDealerId = null; 
 
-        // --- DOM ELEMENTS ---
         const dealerListDisplay = document.getElementById('dealerListDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
         const detailsForm = document.getElementById('detailsForm');
         const formTitle = document.getElementById('formTitle');
-        const loadingMessage = document.getElementById('loadingMessage');
         const formMessage = document.getElementById('formMessage');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const userIdDisplay = document.getElementById('userIdDisplay');
         
-        // --- FIREBASE INITIALIZATION (Auth bypassed) ---
-
-        async function setupFirebase() {
-            // DIAGNOSTICS: Indicate we are skipping auth
-            console.warn("--- Firebase Setup Diagnostics (AUTH BYPASSED) ---");
-            console.warn("Skipping authentication due to environment failure (API Key error).");
-            console.warn("The app will use a FORCED USER ID for Firestore operations.");
-            console.log("Canvas App ID:", appId);
-            console.log("FORCED User ID:", userId);
-            console.log("----------------------------------");
-            
-            try {
-                // Initialize the app with the (mocked/fallback) config
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                
-                // Immediately proceed to setup listener since Auth is bypassed
-                loadingMessage.textContent = `Successfully connected to database with Forced User ID: ${userId}. Loading dealers...`;
-                setupDealerListener(); 
-
-            } catch (error) {
-                console.error("Firebase setup failed during initialization:", error);
-                loadingMessage.textContent = `Failed to connect to the database (Initialization Error): ${error.message}`;
-            }
-        }
-        
-        // --- REAL-TIME DATA LISTENER ---
-
-        function setupDealerListener() {
-            if (!db || !userId) {
-                console.warn("Database or User ID is missing, cannot setup listener.");
-                return;
-            }
-
-            // Path for private user data: /artifacts/{appId}/users/{userId}/dealers
-            const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
-            const dealersCollectionRef = collection(db, collectionPath);
-            
-            // onSnapshot keeps the local 'dealerList' synchronized with Firestore
-            onSnapshot(dealersCollectionRef, (snapshot) => {
-                dealerList = [];
-                snapshot.forEach((doc) => {
-                    dealerList.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Re-render the UI whenever the data changes
-                renderDealerList();
-            }, (error) => {
-                console.error("Error fetching dealers (onSnapshot failed):", error);
-                dealerListDisplay.innerHTML = 
-                    `<p style="text-align: center; color: #d32f2f;">
-                        Error loading dealer data. Security rules or connection error.
-                    </p>`;
-            });
-        }
-        
-        // --- UI RENDER & UTILITIES ---
+        // --- UI UTILITIES ---
         
         function showMessage(type, message) {
             formMessage.textContent = message;
@@ -582,8 +538,6 @@
         }
 
         function renderDealerList() {
-            loadingMessage.style.display = 'none';
-
             if (dealerList.length === 0) {
                 dealerListDisplay.innerHTML = '<p style="text-align: center; color: #8e24aa; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
                 return;
@@ -610,6 +564,7 @@
                 const phoneNumber = dealer.phone_number || 'N/A';
                 const gstinNumber = dealer.gstin_number || 'N/A';
 
+                // We must use the global window.openDealerForm function for onclick events
                 tableHTML += `
                     <tr>
                         <td>${companyName}</td>
@@ -633,7 +588,80 @@
             dealerListDisplay.innerHTML = tableHTML;
         }
 
-        // Exposing to global scope for HTML onclick attributes
+        // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
+
+        async function initFirebaseAndLoadData() {
+            setLogLevel('Debug'); // Enable Firebase debug logging
+
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing. Cannot initialize Firestore.");
+                loadingMessage.style.display = 'none';
+                userIdDisplay.textContent = 'Auth Failed (No Config)';
+                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Database connection failed: Configuration missing.</p>';
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // 1. Authentication
+                let userCredential;
+                if (initialAuthToken) {
+                    userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    userCredential = await signInAnonymously(auth);
+                }
+
+                userId = userCredential.user.uid;
+                userIdDisplay.textContent = userId;
+                
+                // 2. Define the data path for private user data
+                const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
+                dealersCollectionRef = collection(db, collectionPath);
+                
+                // 3. Start listening for real-time updates
+                setupRealtimeListener();
+
+            } catch (error) {
+                console.error("Firebase Initialization or Authentication failed:", error);
+                loadingMessage.style.display = 'none';
+                userIdDisplay.textContent = 'Auth Error';
+                dealerListDisplay.innerHTML = `<p style="text-align: center; color: #d32f2f; font-weight: 700;">Connection Error: Authentication failed. See console.</p>`;
+            }
+        }
+        
+        // --- REAL-TIME DATA LISTENER ---
+        
+        function setupRealtimeListener() {
+            if (!dealersCollectionRef) return;
+
+            loadingMessage.style.display = 'block';
+            const q = query(dealersCollectionRef);
+            
+            // Set up the real-time listener using onSnapshot
+            onSnapshot(q, (snapshot) => {
+                // Map Firestore documents to a local dealer list structure
+                dealerList = snapshot.docs.map(doc => ({
+                    id: doc.id, // Firestore document ID
+                    ...doc.data()
+                }));
+                
+                // Re-render the list immediately whenever data changes
+                renderDealerList(); 
+                loadingMessage.style.display = 'none';
+
+            }, (error) => {
+                console.error("Error setting up real-time listener:", error);
+                loadingMessage.style.display = 'none';
+                dealerListDisplay.innerHTML = `<p style="text-align: center; color: #d32f2f; font-weight: 700;">Real-time update failed: ${error.message}</p>`;
+            });
+        }
+
+
+        // --- UI & FORM LOGIC (Exposed to Global Scope for HTML onClick) ---
+
         window.openDealerForm = function(dealerId = null) {
             detailsForm.reset();
             formMessage.style.display = 'none';
@@ -675,8 +703,8 @@
         detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!db || !userId) {
-                showMessage('error', 'Database not ready. Please wait for initialization.');
+            if (!db || !dealersCollectionRef) {
+                showMessage('error', 'Database not connected. Please refresh and try again.');
                 return;
             }
 
@@ -689,34 +717,27 @@
                 updated_at: new Date().toISOString()
             };
             
-            showMessage('loading', editingDealerId ? 'Updating dealer...' : 'Adding new dealer...');
-
             try {
-                // Path for private user data: /artifacts/{appId}/users/{userId}/dealers
-                const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
-                
                 if (editingDealerId) {
-                    // EDIT MODE
-                    const dealerRef = doc(db, collectionPath, editingDealerId);
-                    await setDoc(dealerRef, formData, { merge: true });
+                    // EDIT MODE: Use setDoc on the existing document reference
+                    const dealerRef = doc(db, dealersCollectionRef.path, editingDealerId);
+                    await setDoc(dealerRef, formData, { merge: true }); // Merge ensures only these fields are updated
                     showMessage('success', 'Dealer updated successfully!');
                 } else {
-                    // ADD MODE
-                    const dealersCollectionRef = collection(db, collectionPath);
+                    // ADD MODE: Use addDoc to create a new document with an auto-generated ID
                     await addDoc(dealersCollectionRef, formData);
                     showMessage('success', 'New dealer added successfully!');
                 }
-
+                
                 closeDealerForm(); 
-
             } catch (error) {
-                console.error('Firestore save failed:', error);
-                showMessage('error', `Failed to save dealer: ${error.message}. Check console for details.`);
+                console.error("Error saving dealer:", error);
+                showMessage('error', `Failed to save dealer: ${error.message}`);
             }
         });
 
-        // 4. Start the application setup when the window loads
-        window.onload = setupFirebase;
+        // Start the application by initializing Firebase and loading dealers
+        window.onload = initFirebaseAndLoadData;
         
     </script>
 </body>
