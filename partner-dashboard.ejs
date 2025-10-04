@@ -210,6 +210,53 @@
             color: #2196f3;
         }
 
+        /* NEW TABLE STYLES for Readability */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table thead tr {
+            background-color: #e3f2fd; /* Light blue header */
+            color: #1a237e;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        .status-badge.pending {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+        .status-badge.shipped {
+            background-color: #e3f2fd;
+            color: #2196f3;
+        }
+        .status-badge.delivered {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        /* End NEW TABLE STYLES */
+
     </style>
 </head>
 <body>
@@ -240,7 +287,8 @@
             <div class="dashboard-card" style="border-left-color: #4caf50;">
                 <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
                 <p style="font-size: 2.5em; color: #4caf50; margin: 0;">03</p>
-                <a href="#" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
+                <!-- Link to the new transaction history section -->
+                <a href="#transactionHistory" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             
             <div class="dashboard-card" style="border-left-color: #2196f3;">
@@ -296,6 +344,77 @@
                 </div>
             </form>
         </section>
+        
+        <!-- NEW: TRANSACTION HISTORY SECTION for Data Readability -->
+        <section class="dashboard-card" id="transactionHistory" style="border-left-color: #00bcd4; margin-bottom: 40px;">
+            <h3><i class="fa-solid fa-list-check"></i> Recent Transaction History</h3>
+            <p style="margin-bottom: 20px; color: #666; font-style: italic;">
+                Structured tables with search, filter, and pagination are essential for readability when lists are large.
+            </p>
+
+            <div class="data-table-container">
+                <!-- Mock Search/Filter Bar to improve convenience -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <input type="text" placeholder="Search by Order ID or Product..." style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    <select style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Filter by Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Quantity (MT)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#JMTS1008</td>
+                                <td>2025-10-01</td>
+                                <td>HB Wire (8G)</td>
+                                <td>10.0</td>
+                                <td><span class="status-badge shipped">Shipped</span></td>
+                            </tr>
+                            <tr>
+                                <td>#JMTS1007</td>
+                                <td>2025-09-28</td>
+                                <td>MS Wire Nails</td>
+                                <td>5.5</td>
+                                <td><span class="status-badge delivered">Delivered</span></td>
+                            </tr>
+                            <tr>
+                                <td>#JMTS1006</td>
+                                <td>2025-09-25</td>
+                                <td>MS Wire (10G)</td>
+                                <td>12.0</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>#JMTS1005</td>
+                                <td>2025-09-20</td>
+                                <td>HB Wire (8G)</td>
+                                <td>8.0</td>
+                                <td><span class="status-badge delivered">Delivered</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="text-align: right; margin-top: 15px; font-size: 0.9em; color: #666;">
+                    Showing 1 - 4 of 24 Total Transactions. <a href="#" style="color: #00bcd4; text-decoration: none; font-weight: 700;">View All →</a>
+                </div>
+            </div>
+        </section>
+        <!-- END NEW SECTION -->
+
 
         <!-- Product Pricing Section -->
         <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
