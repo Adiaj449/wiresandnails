@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// B. THE LOGIN POST ROUTE - NOW RETURNS JSON FOR AJAX HANDLER
+// B. THE LOGIN POST ROUTE - RETURNS JSON AND FORCES SESSION SAVE
 app.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -79,7 +79,6 @@ app.post('/auth/login', async (req, res) => {
             'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
         );
-
         const user = result.rows[0];
 
         // 2. User Not Found OR Password Mismatch
@@ -88,14 +87,23 @@ app.post('/auth/login', async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        // 3. SUCCESS: Create Session
+        // 3. SUCCESS: Set Session Variables
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
         
-        // 4. SUCCESS: Send a 200 response with the redirection URL
-        return res.json({ 
-            success: true, 
-            redirectUrl: '/partner/dashboard' 
+        // 4. CRITICAL FIX: Explicitly save the session to the database 
+        // This ensures the session is available for the next request (/partner/dashboard).
+        req.session.save(err => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
+            }
+            
+            // 5. SUCCESS: Send the JSON redirect instruction for the frontend to handle
+            return res.json({ 
+                success: true, 
+                redirectUrl: '/partner/dashboard' 
+            });
         });
 
     } catch (error) {
@@ -105,14 +113,14 @@ app.post('/auth/login', async (req, res) => {
 });
 
 
-// C. PROTECTED DASHBOARD ROUTE (The 302/redirect problem is fixed if session is persisted)
+// C. PROTECTED DASHBOARD ROUTE
 app.get('/partner/dashboard', (req, res) => {
     // Check if user has a valid session and the isPartner flag is true
     if (req.session.userId && req.session.isPartner) {
         // Serves the partner-dashboard.html file
         res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // If not logged in or not authorized, redirect to home
+        // If not logged in or not authorized, redirect to home (This causes the 302 if session fails)
         res.redirect('/');
     }
 });
