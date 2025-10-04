@@ -12,16 +12,16 @@ background-color: #fff;
 }
 
 /* In your CSS file (e.g., style.css) */
-.logo-large {
-    width: 300px;  /* Example: Set a specific width */
-    height: auto;  /* Maintain aspect ratio */
+.logo-responsive {
+    width: 50%;   /* Image will be 50% of its parent's width */
+    height: auto; /* Maintain aspect ratio */
 }
 
-/* Or if you want a fixed size (can distort if not careful) */
+/* Or relative to viewport width */
 /*
-.logo-large {
-    width: 300px;
-    height: 200px;
+.logo-responsive {
+    width: 25vw;  // Image will be 25% of the viewport width
+    height: auto;
 }
 */
 
