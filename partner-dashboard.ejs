@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
+    <!-- Link to your main stylesheet for consistent styling -->
     <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
@@ -14,6 +15,7 @@
         body {
             background-color: #f4f7f6; 
             padding-top: 0;
+            font-family: 'Roboto Condensed', sans-serif;
         }
         .dashboard-header {
             background-color: #ffffff;
@@ -43,6 +45,7 @@
             color: #1a237e; 
             margin: 0;
             font-size: 1.8em; 
+            font-weight: 700;
         }
         .logout-form {
             margin-left: auto;
@@ -56,6 +59,9 @@
             cursor: pointer;
             font-weight: 700;
             transition: background-color 0.3s;
+        }
+        .logout-form button:hover {
+            background-color: #b71c1c;
         }
         .dashboard-content {
             max-width: 1200px;
@@ -75,6 +81,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             text-align: left;
             border-left: 5px solid #ff9800;
+            position: relative; 
         }
         .dashboard-card h3 {
             color: #1a237e;
@@ -83,6 +90,9 @@
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .dashboard-card ul {
             list-style: none;
@@ -106,6 +116,100 @@
             font-weight: 700;
             text-decoration: none;
         }
+
+        /* Dealer Details Specific Styles */
+        .dealer-details-info, .dealer-details-form {
+            padding: 10px 0;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .info-row strong {
+            width: 150px; 
+            color: #1a237e;
+            font-weight: 700;
+        }
+        
+        .dealer-details-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        .dealer-details-form input, .dealer-details-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box; 
+        }
+
+        .form-action-buttons {
+            margin-top: 20px;
+        }
+        .form-action-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+
+        .form-action-buttons .save-btn {
+            background-color: #4caf50; 
+            color: white;
+        }
+        .form-action-buttons .cancel-btn {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .form-action-buttons .save-btn:hover { background-color: #388e3c; }
+        .form-action-buttons .cancel-btn:hover { background-color: #ddd; }
+
+        .edit-toggle-btn {
+            background: none;
+            border: 1px solid #ff9800;
+            color: #ff9800;
+            font-size: 0.9em;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .edit-toggle-btn:hover {
+            background-color: #fff3e0;
+        }
+
+        .message-box {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 700;
+        }
+        .message-box.success {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        .message-box.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        .message-box.loading {
+            background-color: #e3f2fd;
+            color: #2196f3;
+        }
+
     </style>
 </head>
 <body>
@@ -117,6 +221,7 @@
                     alt="Shree JMTS Wires & Nails Logo" 
                     class="logo-wires"
                 >
+                <!-- EJS INJECTION -->
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
@@ -130,6 +235,7 @@
 
     <div class="dashboard-content">
         
+        <!-- Quick Stats / Summary Section -->
         <section class="dashboard-grid">
             <div class="dashboard-card" style="border-left-color: #4caf50;">
                 <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
@@ -150,6 +256,48 @@
             </div>
         </section>
 
+        <!-- DEALER DETAILS SECTION -->
+        <section class="dashboard-card" id="dealerDetailsCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
+            <h3>
+                <i class="fa-solid fa-address-card"></i> Dealer Account Details 
+                <button class="edit-toggle-btn" id="editButton" onclick="toggleEditMode(true)">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                </button>
+            </h3>
+
+            <!-- Display Mode (Default View) -->
+            <div id="detailsDisplay" class="dealer-details-info">
+                <p id="loadingMessage" style="color: #2196f3;">Loading partner details...</p>
+                <!-- Content will be injected by JavaScript -->
+            </div>
+
+            <!-- Edit/Input Form (Hidden by Default) -->
+            <form id="detailsForm" class="dealer-details-form" style="display: none;">
+                <label for="companyName">Company Name <span style="color:red;">*</span></label>
+                <input type="text" id="companyName" name="companyName" required>
+
+                <label for="contactPerson">Contact Person</label>
+                <input type="text" id="contactPerson" name="contactPerson">
+
+                <label for="phoneNumber">Phone Number <span style="color:red;">*</span></label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required>
+
+                <label for="gstinNumber">GSTIN / Tax ID</label>
+                <input type="text" id="gstinNumber" name="gstinNumber" maxlength="15">
+
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="3"></textarea>
+                
+                <div class="message-box" id="formMessage" style="display: none;"></div>
+
+                <div class="form-action-buttons">
+                    <button type="submit" class="save-btn"><i class="fa-solid fa-save"></i> Save Details</button>
+                    <button type="button" class="cancel-btn" onclick="toggleEditMode(false)"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Product Pricing Section -->
         <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
             <h3><i class="fa-solid fa-tags"></i> Exclusive Partner Pricing (Current Rates)</h3>
             <ul>
@@ -173,6 +321,7 @@
             <a href="#" class="download-link"><i class="fa-solid fa-download"></i> Download Full Pricelist PDF</a>
         </section>
 
+        <!-- Distributor Documents Section -->
         <section class="dashboard-card" style="border-left-color: #607d8b;">
             <h3><i class="fa-solid fa-file-pdf"></i> Distributor Resources & Downloads</h3>
             <ul>
@@ -193,5 +342,136 @@
         
     </div>
     
+    <script>
+        const detailsDisplay = document.getElementById('detailsDisplay');
+        const detailsForm = document.getElementById('detailsForm');
+        const editButton = document.getElementById('editButton');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const formMessage = document.getElementById('formMessage');
+
+        let dealerData = {}; // Cache for the current data
+
+        // Helper function to show form messages
+        function showMessage(type, message) {
+            formMessage.textContent = message;
+            formMessage.className = 'message-box ' + type;
+            formMessage.style.display = 'block';
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // Toggles between the display view and the edit form
+        function toggleEditMode(isEditing) {
+            if (isEditing) {
+                // Populate the form with current data (or empty if none)
+                document.getElementById('companyName').value = dealerData.company_name || '';
+                document.getElementById('contactPerson').value = dealerData.contact_person || '';
+                document.getElementById('phoneNumber').value = dealerData.phone_number || '';
+                document.getElementById('gstinNumber').value = dealerData.gstin_number || '';
+                document.getElementById('address').value = dealerData.address || '';
+
+                detailsDisplay.style.display = 'none';
+                detailsForm.style.display = 'block';
+                editButton.style.display = 'none';
+
+            } else {
+                // Switch back to display mode
+                detailsDisplay.style.display = 'block';
+                detailsForm.style.display = 'none';
+                editButton.style.display = 'inline-block';
+            }
+            formMessage.style.display = 'none'; // Clear message on toggle
+        }
+
+        // Renders the fetched data into the display area
+        function renderDetails(data) {
+            loadingMessage.style.display = 'none';
+            
+            if (!data || Object.keys(data).length === 0) {
+                detailsDisplay.innerHTML = `
+                    <p style="color: #d32f2f; font-style: italic;">
+                        No details found. Please click 'Enter Details' to provide your company information.
+                    </p>`;
+                editButton.innerHTML = `<i class="fa-solid fa-plus"></i> Enter Details`;
+                return;
+            }
+
+            dealerData = data;
+            editButton.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit Details`;
+            
+            detailsDisplay.innerHTML = `
+                <div class="info-row"><strong>Company Name:</strong> <span>${data.company_name || 'N/A'}</span></div>
+                <div class="info-row"><strong>Contact Person:</strong> <span>${data.contact_person || 'N/A'}</span></div>
+                <div class="info-row"><strong>Phone Number:</strong> <span>${data.phone_number || 'N/A'}</span></div>
+                <div class="info-row"><strong>GSTIN / Tax ID:</strong> <span>${data.gstin_number || 'N/A'}</span></div>
+                <div class="info-row"><strong>Address:</strong> <span>${data.address ? data.address.replace(/\n/g, '<br>') : 'N/A'}</span></div>
+            `;
+        }
+
+        // 1. Fetch data on page load
+        async function fetchDealerDetails() {
+            loadingMessage.style.display = 'block';
+            try {
+                const response = await fetch('/api/dealer-details');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderDetails(result.details);
+                } else {
+                    renderDetails({}); // Show "No details found" message
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                loadingMessage.textContent = 'Could not load details due to a server error.';
+            }
+        }
+
+        // 2. Handle form submission
+        detailsForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                gstinNumber: document.getElementById('gstinNumber').value,
+                address: document.getElementById('address').value
+            };
+            
+            showMessage('loading', 'Saving details...');
+
+            try {
+                const response = await fetch('/api/dealer-details', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update the cached data and re-render the display
+                    dealerData = result.details;
+                    renderDetails(dealerData);
+                    toggleEditMode(false); // Switch back to display mode
+                    showMessage('success', result.message);
+                } else {
+                    showMessage('error', result.message || 'Failed to save details.');
+                }
+
+            } catch (error) {
+                console.error('Save error:', error);
+                showMessage('error', 'Network error. Could not connect to the server.');
+            }
+        });
+
+        // Run the fetch function when the script loads
+        fetchDealerDetails();
+
+    </script>
 </body>
 </html>
