@@ -46,7 +46,7 @@
 
   <div id="loginModal" class="modal">
     <div class="login-box">
-      <span class="close-btn" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+      <span class="close-btn" onclick="document.getElementById('loginModal').style.display='none'">×</span>
       
       <h2 class="login-heading">Partner Login</h2> 
       <p class="subtitle">Secure access for registered dealers.</p>
@@ -219,5 +219,55 @@
     </div>
   </footer>
 
+  <script>
+    const loginForm = document.querySelector('.login-form');
+    const loginModal = document.getElementById('loginModal');
+    
+    // Create an error message element and insert it into the form
+    const errorMessageElement = document.createElement('p');
+    errorMessageElement.style.color = 'red';
+    errorMessageElement.style.marginTop = '10px';
+    errorMessageElement.style.textAlign = 'center';
+    errorMessageElement.id = 'login-error-message';
+    // Insert it right before the login button in the form
+    loginForm.insertBefore(errorMessageElement, document.querySelector('.login-button'));
+    
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // STOP the default browser submission
+        
+        // Clear any previous errors
+        document.getElementById('login-error-message').textContent = '';
+        
+        // Get form data
+        // Note: URLSearchParams(new FormData(loginForm)) is necessary for fetch POST
+        const formData = new URLSearchParams(new FormData(loginForm));
+
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.redirectUrl) {
+                // SUCCESS: Close the modal and redirect the browser manually
+                loginModal.style.display = 'none';
+                window.location.href = data.redirectUrl; 
+            } else {
+                // FAILURE: Display the error message in the modal
+                document.getElementById('login-error-message').textContent = data.message || "Login failed. Check your credentials.";
+            }
+
+        } catch (error) {
+            console.error('Login Fetch Error:', error);
+            document.getElementById('login-error-message').textContent = "An unexpected server error occurred. Try again.";
+        }
+    });
+  </script>
 </body>
 </html>

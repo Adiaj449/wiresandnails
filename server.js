@@ -65,12 +65,12 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// B. THE LOGIN POST ROUTE
+// B. THE LOGIN POST ROUTE - NOW RETURNS JSON
 app.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.redirect('/?loginError=MissingFields'); 
+        return res.status(400).json({ success: false, message: 'Missing username or password.' });
     }
 
     try {
@@ -84,20 +84,23 @@ app.post('/auth/login', async (req, res) => {
 
         // 2. User Not Found OR Password Mismatch
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-            // FAILED: Redirect back to home with an error parameter
-            return res.redirect('/?loginError=InvalidCredentials');
+            // FAILED: Send a 401 response with a JSON error message
+            return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
         // 3. SUCCESS: Create Session
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
         
-        // 4. Redirect to Protected Area
-        return res.redirect('/partner/dashboard');
+        // 4. SUCCESS: Send a 200 response with the redirection URL
+        return res.json({ 
+            success: true, 
+            redirectUrl: '/partner/dashboard' 
+        });
 
     } catch (error) {
         console.error('Login database or bcrypt error:', error);
-        return res.redirect('/?loginError=ServerError');
+        return res.status(500).json({ success: false, message: 'An unexpected server error occurred.' });
     }
 });
 
