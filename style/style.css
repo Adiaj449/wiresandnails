@@ -7,11 +7,11 @@
     box-sizing: border-box;
 }
 
-/* Base Body Styles (Dark Industrial Theme) */
+/* Base Body Styles (Lighter Dark Industrial Theme: #121212) */
 body {
-    background-color: #1A1A1A; /* Near Black */
+    background-color: #121212; /* Updated to a lighter dark grey */
     font-family: 'Roboto Condensed', sans-serif;
-    color: #FFFFFF; /* Default text color is white */
+    color: #FFFFFF; 
 }
 
 /* Base Typography */
@@ -24,7 +24,7 @@ h1 {
 }
 
 h2 {
-    /* Main section headings (Our Products, Our Core Commitment, etc.) */
+    /* Main section headings */
     font-family: 'Roboto Condensed', sans-serif;
     font-weight: 700;
     font-size: 2.5rem;
@@ -92,8 +92,8 @@ a:hover {
 /* Partner Login Trigger Button (Top Left Position) */
 .login-trigger-button {
     position: absolute; 
-    top: 20px; /* Distance from top */
-    left: 20px; /* <--- KEY CHANGE: Distance from left */
+    top: 20px; 
+    left: 20px; /* Positioned on the left side */
     z-index: 10; 
     
     /* Button appearance */
@@ -107,7 +107,7 @@ a:hover {
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.3s;
-    display: flex; /* For icon/text alignment */
+    display: flex;
     align-items: center;
 }
 
@@ -154,13 +154,14 @@ a:hover {
 /* MAIN CONTENT SECTIONS (Products, About, Contact) */
 /* ============================================== */
 
+/* Set section background to match body or be slightly darker/lighter for effect */
 .products, .about, .contact {
-    background-color: #1A1A1A;
+    background-color: #121212;
     padding: 80px 20px;
     color: #FFFFFF;
 }
 
-/* Product Section */
+/* Product Section Card Background */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -170,7 +171,7 @@ a:hover {
 }
 
 .product {
-    background: #2c2c2c; /* Dark card background */
+    background: #222222; /* Lighter dark card background for contrast with body */
     border-radius: 15px;
     padding: 30px 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -222,7 +223,7 @@ a:hover {
 }
 
 .commitment-box {
-    background: #2c2c2c;
+    background: #222222; /* Lighter dark card background for contrast */
     border-left: 5px solid #E6B31E; /* Gold border accent */
     border-radius: 8px;
     padding: 25px;
@@ -260,7 +261,7 @@ a:hover {
 }
 
 .contact-info-block {
-    background: #2c2c2c;
+    background: #222222; /* Lighter dark card background for contrast */
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -280,7 +281,7 @@ a:hover {
 }
 
 .contact-form {
-    background: #2c2c2c;
+    background: #222222; /* Lighter dark card background for contrast */
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -315,7 +316,7 @@ a:hover {
 /* ============================================== */
 
 .footer {
-    background-color: #111111; 
+    background-color: #0c0c0c; /* Slightly darker than body for footer depth */
     color: #e0e0e0;
     padding: 60px 20px 30px;
     font-family: 'Roboto Condensed', sans-serif;
@@ -367,8 +368,8 @@ a:hover {
     color: #ccc;
     text-decoration: none;
     transition: color 0.3s ease;
-    padding: 0; /* Override base link padding */
-    background: none; /* Override base link background */
+    padding: 0; 
+    background: none; 
 }
 
 .footer-links ul li a:hover {
@@ -391,8 +392,8 @@ a:hover {
     font-size: 1.2rem;
     margin-right: 12px;
     transition: transform 0.3s ease, color 0.3s ease;
-    padding: 0; /* Override base link padding */
-    background: none; /* Override base link background */
+    padding: 0; 
+    background: none; 
 }
 
 .social-icons a:hover {
@@ -416,7 +417,7 @@ a:hover {
 
 /* The Modal (background overlay) */
 .modal {
-    display: none; /* CRITICAL: Hidden by default */
+    display: none; 
     position: fixed; 
     z-index: 1000; 
     left: 0;
@@ -454,7 +455,7 @@ a:hover {
 
 /* Login Box (Modal Content) */
 .login-box {
-    background-color: #2c2c2c;
+    background-color: #222222; /* Lighter dark card background for contrast */
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
@@ -503,8 +504,8 @@ a:hover {
 .forgot-password {
     color: #a0a0a0;
     text-decoration: none;
-    padding: 0; /* Remove padding inherited from base 'a' */
-    background: none; /* Remove background inherited from base 'a' */
+    padding: 0; 
+    background: none; 
 }
 
 .forgot-password:hover {
@@ -533,8 +534,8 @@ a:hover {
     /* Adjusted button for smaller screens to stay on top left */
     .login-trigger-button {
         top: 10px;
-        left: 10px; /* Adjusted left position for small screens */
-        right: auto; /* Ensure right property doesn't interfere */
+        left: 10px;
+        right: auto; 
         padding: 8px 15px;
         font-size: 0.9em;
     }
