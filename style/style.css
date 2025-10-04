@@ -4,27 +4,58 @@ padding: 0;
 box-sizing: border-box;
 }
 
+/*
+  1. Link to Google Font in your HTML <head> first:
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+*/
 
 body {
-/* Default for body and paragraphs */
+/* Set a clean light-grey background */
+background-color: #F4F4F4; /* Very light grey */
+
+/* Default font for body and paragraphs */
 font-family: 'Montserrat', sans-serif;
-color: #333; /* Good readability */
+color: #333333; /* Very Dark Grey for excellent readability */
 }
 
 h1 {
-/* Use a bold weight for the main heading */
+/* Main title: JMTS Shree Wires & Nails */
 font-family: 'Montserrat', sans-serif;
-font-weight: 700; /* Bold */
-font-size: 2.5em; /* Large size */
-color: #0056b3; /* Or an industrial color like dark blue or gray */
+font-weight: 700; /* Bold weight */
+font-size: 2.8em; 
+
+/* Use the main accent color (Dark Charcoal) */
+color: #4F4F4F; 
+}
+
+p {
+/* Paragraphs: HB Wire Products Manufacturer in Jalna */
+font-weight: 400; /* Regular weight */
+font-size: 1.1em;
+color: #333333; 
 }
 
 a {
-/* Ensure call-to-action link is also clear */
-font-family: 'Montserrat', sans-serif;
-font-weight: 700; 
+/* Call-to-action link: Explore Products */
+display: inline-block; /* Makes padding/margins work well */
+text-decoration: none; /* Remove underline */
+padding: 10px 20px;
+border-radius: 4px;
+font-weight: 700; /* Bold */
+
+/* Use the main accent color for the button */
+background-color: #4F4F4F; 
+color: #FFFFFF; /* White text on the dark button */
+border: 2px solid #4F4F4F; /* Solid border */
+
+/* Optional hover effect for modern feel */
+transition: background-color 0.3s, color 0.3s;
 }
 
+a:hover {
+background-color: #333333; /* Slightly darker on hover */
+color: #FFFFFF;
+}
 #main-logo-override {
     width: 450px !important;  /* Set the exact size you want */
     height: auto !important;  /* Keep the aspect ratio */
