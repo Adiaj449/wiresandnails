@@ -4,54 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
+    
+    <link rel="stylesheet" href="/style/style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* DASHBOARD SPECIFIC STYLES */
         body {
-            font-family: 'Roboto Condensed', sans-serif;
-            background-color: #f0f8ff;
-            color: #333;
-            padding: 40px;
+            background-color: #f4f7f6; /* Lighter background than the hero section */
+            padding-top: 0;
+        }
+        .dashboard-header {
+            background-color: #1a237e; /* Deep Indigo - Primary color */
+            color: white;
+            padding: 20px 0;
             text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .dashboard-header h1 {
+            color: white;
+            margin: 0;
+            font-size: 2.5em;
         }
-        h1 {
-            color: #1a237e; /* Deep Indigo */
-            margin-bottom: 10px;
-        }
-        p {
+        .dashboard-header p {
+            margin-top: 5px;
             font-size: 1.1em;
-            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .logout-form {
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
         .logout-form button {
-            padding: 12px 25px;
-            background-color: #d32f2f; /* Red for logout */
+            background-color: #d32f2f;
             color: white;
             border: none;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
             font-weight: 700;
             transition: background-color 0.3s;
         }
-        .logout-form button:hover {
-            background-color: #c62828;
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            border-left: 5px solid #ff9800; /* Amber accent */
+        }
+        .dashboard-card h3 {
+            color: #1a237e;
+            margin-top: 0;
+            font-size: 1.5em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .dashboard-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .dashboard-card ul li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ddd;
+            font-size: 1em;
+            display: flex;
+            justify-content: space-between;
+        }
+        .dashboard-card ul li:last-child {
+            border-bottom: none;
+        }
+        .download-link {
+            display: block;
+            margin-top: 15px;
+            text-align: right;
+            color: #ff9800;
+            font-weight: 700;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome, Registered Partner!</h1>
-        <p>Access your exclusive bulk order pricing, inventory status, and distributor resources here.</p>
+    <header class="dashboard-header">
+        <div class="logout-form">
+            <form action="/auth/logout" method="POST">
+                <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+            </form>
+        </div>
+        <h1><i class="fa-solid fa-gauge-high"></i> Partner Dashboard</h1>
+        <p>Welcome back! Access your exclusive resources and real-time data below.</p>
+    </header>
+
+    <div class="dashboard-content">
         
-        <form action="/auth/logout" method="POST" class="logout-form">
-            <button type="submit">Logout</button>
-        </form>
+        <section class="dashboard-grid">
+            <div class="dashboard-card" style="border-left-color: #4caf50;">
+                <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
+                <p style="font-size: 2.5em; color: #4caf50; margin: 0;">03</p>
+                <a href="#" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="dashboard-card" style="border-left-color: #2196f3;">
+                <h3><i class="fa-solid fa-warehouse"></i> Inventory Stock</h3>
+                <p style="font-size: 2.5em; color: #2196f3; margin: 0;">240 MT</p>
+                <a href="#" class="download-link">Check Stock Levels <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="dashboard-card" style="border-left-color: #ff5722;">
+                <h3><i class="fa-solid fa-sack-dollar"></i> Current Rate Index</h3>
+                <p style="font-size: 2.5em; color: #ff5722; margin: 0;">₹45,500/MT</p>
+                <a href="#pricing" class="download-link">Full Price List <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </section>
+
+        <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
+            <h3><i class="fa-solid fa-tags"></i> Exclusive Partner Pricing (Current Rates)</h3>
+            <ul>
+                <li>
+                    <span>HB Wire (8 Gauge)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹46,500 / MT</span>
+                </li>
+                <li>
+                    <span>MS Wire (10 Gauge)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹45,900 / MT</span>
+                </li>
+                <li>
+                    <span>MS Wire Nails (All Sizes)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹48,100 / MT</span>
+                </li>
+                <li>
+                    <span>BOPP Tape (Bulk)</span> 
+                    <span style="font-weight: 700; color: #1a237e;">₹750 / Roll</span>
+                </li>
+            </ul>
+            <a href="#" class="download-link"><i class="fa-solid fa-download"></i> Download Full Pricelist PDF</a>
+        </section>
+
+        <section class="dashboard-card" style="border-left-color: #607d8b;">
+            <h3><i class="fa-solid fa-file-pdf"></i> Distributor Resources & Downloads</h3>
+            <ul>
+                <li>
+                    <span>Product Catalog (Q4 2025)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+                <li>
+                    <span>Quality Assurance Certificate (ISO)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+                <li>
+                    <span>New Product Launch Guide (MS Mesh)</span> 
+                    <a href="#" style="color: #607d8b; text-decoration: none;"><i class="fa-solid fa-cloud-arrow-down"></i> Download</a>
+                </li>
+            </ul>
+        </section>
+        
     </div>
-</body>
+    
+    </body>
 </html>
