@@ -142,7 +142,7 @@
       color: #555;
     }
 
-    /* About Section */
+    /* About Section - STYLISH UPDATE */
     .about {
       padding: 80px 20px;
       background: #fff;
@@ -150,20 +150,73 @@
     }
 
     .about h2 {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       margin-bottom: 20px;
-      color: #222;
+      color: #d32f2f; /* Highlighted color */
+      font-weight: 700;
     }
 
-    .about p {
-      max-width: 900px;
-      margin: 0 auto;
-      font-size: 1rem;
+    .about-content {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .about-text {
+        text-align: left;
+    }
+
+    .about-text p {
+      font-size: 1.1rem;
       color: #555;
       line-height: 1.8;
+      margin-bottom: 20px;
     }
 
-    /* Contact Section */
+    .about-stats {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .stat-item {
+        background: #fdf6f6; /* Light red/pink background */
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(211, 47, 47, 0.2);
+    }
+
+    .stat-item i {
+        font-size: 2.5rem;
+        color: #d32f2f;
+        margin-bottom: 10px;
+    }
+
+    .stat-item h3 {
+        font-size: 2rem;
+        color: #222;
+        margin-bottom: 5px;
+    }
+
+    .stat-item p {
+        font-size: 0.95rem;
+        color: #777;
+        margin: 0;
+    }
+
+
+    /* Contact Section - STYLISH UPDATE */
     .contact {
       background: #f8f8f8;
       padding: 80px 20px;
@@ -171,25 +224,104 @@
     }
 
     .contact h2 {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       color: #222;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
+      font-weight: 700;
     }
 
-    .contact-info {
-      max-width: 800px;
-      margin: 0 auto;
+    .contact-grid {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr; /* Info on left, Map/Form on right */
+        gap: 40px;
+        text-align: left;
     }
 
-    .contact-info p {
-      font-size: 1rem;
-      color: #555;
-      margin: 10px 0;
+    @media (max-width: 850px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
-    .contact-info i {
+    .contact-info-block {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-info-block h3 {
+        font-size: 1.5rem;
+        color: #d32f2f;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .contact-detail {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .contact-detail i {
       color: #d32f2f;
-      margin-right: 8px;
+      font-size: 1.5rem;
+      margin-right: 15px;
+      width: 30px;
+      text-align: center;
+    }
+
+    /* Simple Contact Form Styling */
+    .contact-form {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form h3 {
+        font-size: 1.5rem;
+        color: #222;
+        margin-bottom: 20px;
+    }
+
+    .contact-form input, .contact-form textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .contact-form input:focus, .contact-form textarea:focus {
+        border-color: #d32f2f;
+        outline: none;
+    }
+
+    .contact-form button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: #d32f2f;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .contact-form button:hover {
+        background: #b71c1c;
     }
 
     /* Footer */
@@ -286,7 +418,6 @@
 </head>
 <body>
 
-  <!-- Hero Section with Video Background -->
   <section class="hero" id="hero">
     <video autoplay loop muted playsinline class="video-background">
       <source src="/Images/Jmts_video.mov" type="video/mp4">
@@ -300,7 +431,6 @@
     </div>
   </section>
 
-  <!-- Products Section -->
   <section class="products" id="products">
     <h2>Our Products</h2>
     <div class="product-grid">
@@ -326,23 +456,82 @@
     </div>
   </section>
 
-  <!-- About Us Section -->
   <section class="about" id="about">
-    <h2>About Us</h2>
-    <p>Shree JMTS Wires & Nails is a trusted manufacturer of HB Wire, MS Wire, and MS Nails based in Jalna, Maharashtra, India. With a commitment to quality, precision, and durability, we serve construction, industrial, and fabrication sectors with premium wire and nail products. Our dedication to excellence and customer satisfaction drives us to continually innovate and deliver the best in class products across India.</p>
-  </section>
+    <h2>About Our Commitment</h2>
+    <div class="about-content">
+        <div class="about-text">
+            <p>Shree JMTS Wires & Nails is a trusted manufacturer of **HB Wire, MS Wire, and MS Nails** based in Jalna, Maharashtra, India. Our foundation is built on a non-negotiable commitment to **quality, precision, and durability** in every product we manufacture.</p>
+            <p>We leverage modern manufacturing techniques and stringent quality checks to ensure our wire and nail products not only meet but exceed industry standards. We proudly serve the construction, industrial, and fabrication sectors with premium materials, helping to build strong foundations and lasting structures across India.</p>
+            <p>Our dedication to excellence and customer satisfaction drives us to continually innovate and deliver the best-in-class products.</p>
+        </div>
 
-  <!-- Contact Section -->
-  <section class="contact" id="contact">
-    <h2>Contact Us</h2>
-    <div class="contact-info">
-      <p><i class="fa-solid fa-location-dot"></i> MIDC Industrial Area, Jalna, Maharashtra, India - 431203</p>
-      <p><i class="fa-solid fa-phone"></i> +91 8055729900</p>
-      <p><i class="fa-solid fa-envelope"></i> info@shreejmts.com</p>
+        <div class="about-stats">
+            <div class="stat-item">
+                <i class="fa-solid fa-industry"></i>
+                <h3>10+</h3>
+                <p>Years of Industry Experience</p>
+            </div>
+            <div class="stat-item">
+                <i class="fa-solid fa-handshake"></i>
+                <h3>500+</h3>
+                <p>Satisfied Clients</p>
+            </div>
+            <div class="stat-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>10K+</h3>
+                <p>Tons of Wire Produced</p>
+            </div>
+            <div class="stat-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>ISO Certified</h3>
+                <p>Commitment to Quality</p>
+            </div>
+        </div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <section class="contact" id="contact">
+    <h2>Connect With Us</h2>
+    <div class="contact-grid">
+
+        <div class="contact-info-block">
+            <h3>Our Details</h3>
+            
+            <div class="contact-detail">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <p><strong>Address:</strong> MIDC Industrial Area, Jalna, Maharashtra, India - 431203</p>
+            </div>
+
+            <div class="contact-detail">
+                <i class="fa-solid fa-phone-volume"></i>
+                <p><strong>Phone:</strong> +91 8055729900</p>
+            </div>
+
+            <div class="contact-detail">
+                <i class="fa-solid fa-at"></i>
+                <p><strong>Email:</strong> info@shreejmts.com</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15112.983935275815!2d75.86797746592275!3d19.82421453472061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdaa02641a96575%3A0x15359a35a7203a98!2sJalna%20MIDC%20Industrial%20Area!5e0!3m2!1sen!2sin!4v1699944000000" width="100%" height="250" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+
+        </div>
+
+        <div class="contact-form">
+            <h3>Send Us a Message</h3>
+            <form action="#" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Your Phone Number (Optional)">
+                <textarea name="message" rows="5" placeholder="How can we help you?" required></textarea>
+                <button type="submit">Send Inquiry</button>
+            </form>
+        </div>
+
+    </div>
+  </section>
+
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-logo">
