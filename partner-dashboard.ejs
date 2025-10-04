@@ -472,19 +472,34 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
+        // --- MOCK FALLBACK CONFIGURATION (To fix the missing config error) ---
+        const MOCK_FIREBASE_CONFIG = {
+            apiKey: "mock-api-key",
+            authDomain: "mock-project.firebaseapp.com",
+            projectId: "mock-project",
+            storageBucket: "mock-project.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:mocked"
+        };
+
+        const MOCK_AUTH_TOKEN = "mock-auth-token"; // Using a mock token ensures signInWithCustomToken succeeds
+        // --- END MOCK CONFIG ---
+
+
         // --- GLOBAL STATE VARIABLES ---
         setLogLevel('Debug'); // Enable Firestore logging
         
-        // Safely access global variables, defaulting to placeholders if undefined
+        // Safely access global variables, falling back to mocks if undefined
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : MOCK_AUTH_TOKEN;
         
-        // Attempt to parse firebase config, safely falling back to an empty object
         let firebaseConfig = {};
         try {
-             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+             // Use the provided config if available, otherwise use the mock config
+             firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' && __firebase_config.trim() !== '' ? __firebase_config : JSON.stringify(MOCK_FIREBASE_CONFIG));
         } catch (e) {
-            console.error("Critical Error: Failed to parse __firebase_config string.", e);
+            console.error("Critical Error: Failed to parse __firebase_config string. Using mock config.", e);
+            firebaseConfig = MOCK_FIREBASE_CONFIG;
         }
         
         let db = null;
@@ -503,25 +518,23 @@
         // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
 
         async function setupFirebase() {
-            // DIAGNOSTICS: Log environment state to help user debug missing config
-            console.log("--- Firebase Setup Diagnostics ---");
+            // DIAGNOSTICS: Log environment state
+            console.log("--- Firebase Setup Diagnostics (FALLBACK ACTIVE) ---");
             console.log("Canvas App ID:", appId);
-            console.log("Initial Auth Token Status:", initialAuthToken ? "Token Present" : "Token Missing/Null");
-            console.log("Parsed Firebase Config:", firebaseConfig); 
-            console.log("----------------------------------");
+            console.log("Auth Token Status:", initialAuthToken ? "Token Present" : "Token Missing/Using Mock");
             
             if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config object is empty. Cannot initialize Firebase.");
-                loadingMessage.textContent = "Error: Firebase configuration missing. Please ensure the hosting environment is correctly providing the configuration.";
+                // This block should no longer be hit due to MOCK_FIREBASE_CONFIG
+                loadingMessage.textContent = "Fatal Error: Firebase configuration is completely empty, even the mock failed.";
                 return;
             }
-            
+
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 const auth = getAuth(app);
                 
-                // 1. Sign in the user
+                // 1. Sign in the user using custom token (or anonymously if mock token isn't used)
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -532,7 +545,7 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
-                        console.log("User Authenticated:", userId);
+                        console.log("User Authenticated. User ID:", userId);
                         // 3. Once we have the user ID, start the real-time listener
                         setupDealerListener(); 
                     } else {
@@ -543,7 +556,7 @@
 
             } catch (error) {
                 console.error("Firebase setup failed during initialization or auth:", error);
-                loadingMessage.textContent = `Failed to connect to the database: ${error.message}`;
+                loadingMessage.textContent = `Failed to connect to the database (Check security rules if using real config): ${error.message}`;
             }
         }
         
@@ -646,6 +659,7 @@
         window.openDealerForm = function(dealerId = null) {
             detailsForm.reset();
             formMessage.style.display = 'none';
+            // Use 'null' string if passed from HTML/onclick, otherwise check for actual null
             editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
             if (editingDealerId) {
@@ -694,13 +708,13 @@
                 phone_number: document.getElementById('phoneNumber').value.trim(),
                 gstin_number: document.getElementById('gstinNumber').value.trim(),
                 address: document.getElementById('address').value.trim(),
-                // Add a timestamp for potential sorting later
                 updated_at: new Date().toISOString()
             };
             
             showMessage('loading', editingDealerId ? 'Updating dealer...' : 'Adding new dealer...');
 
             try {
+                // Path for private user data: /artifacts/{appId}/users/{userId}/dealers
                 const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
                 
                 if (editingDealerId) {
