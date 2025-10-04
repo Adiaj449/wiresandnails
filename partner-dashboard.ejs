@@ -5,6 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- GLOBAL SETUP ---
+        setLogLevel('Debug'); // Enable Firestore logging
+        
+        // Canvas Global Variables (MANDATORY USE)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let userId = null;
+        let dealerList = []; // Will hold the real-time data
+        let isAuthReady = false;
+
+        // Function to initialize and authenticate
+        async function setupFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing.");
+                    return;
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Use custom token if provided, otherwise sign in anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Wait for the auth state to resolve
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        // Start the database listener only after auth is ready
+                        setupDealerListener(); 
+                    } else {
+                        // This case should ideally not happen if auth is successful
+                        userId = crypto.randomUUID(); 
+                        isAuthReady = true;
+                        document.getElementById('loadingMessage').textContent = "User session is ready (Anonymous).";
+                        // Optionally still call listener, but rules might block anonymous access
+                        setupDealerListener(); 
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase setup failed:", error);
+                document.getElementById('loadingMessage').textContent = "Failed to connect to the database.";
+            }
+        }
+        
+        // Function to set up the real-time listener for the dealer list
+        function setupDealerListener() {
+            if (!isAuthReady || !userId) return;
+
+            const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
+            const dealersCollectionRef = collection(db, collectionPath);
+
+            // onSnapshot provides real-time updates to the dealerList array
+            onSnapshot(dealersCollectionRef, (snapshot) => {
+                dealerList = [];
+                snapshot.forEach((doc) => {
+                    // Store the document ID with the data for update/delete operations
+                    dealerList.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Re-render the UI whenever the data changes
+                renderDealerList();
+            }, (error) => {
+                console.error("Error fetching dealers:", error);
+                document.getElementById('dealerListDisplay').innerHTML = 
+                    `<p style="text-align: center; color: #d32f2f;">
+                        Error loading data. Check console for details.
+                    </p>`;
+            });
+        }
+        
+        // Expose global functions to be called by HTML buttons/form (mandatory for EJS)
+        window.setupFirebase = setupFirebase;
+        window.openDealerForm = openDealerForm;
+        window.closeDealerForm = closeDealerForm;
+
+        // Run setup on load
+        window.onload = setupFirebase;
+
+    </script>
+
     <!-- Link to your main stylesheet for consistent styling -->
     <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -301,7 +399,7 @@
             </div>
         </section>
 
-        <!-- NEW: DEALER MANAGEMENT SECTION (List View) -->
+        <!-- DEALER MANAGEMENT SECTION (List View) -->
         <section class="dashboard-card" id="dealerManagementCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
             <div class="section-header">
                  <h3><i class="fa-solid fa-users-gear"></i> Manage Dealer Network </h3>
@@ -318,7 +416,7 @@
 
             <!-- Dealer List Display Area -->
             <div id="dealerListDisplay" style="margin-top: 15px;">
-                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Loading dealer list...</p>
+                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Connecting to database and loading dealer list...</p>
                 <!-- Table will be injected here by JavaScript -->
             </div>
         </section>
@@ -357,10 +455,6 @@
         <!-- TRANSACTION HISTORY SECTION for Data Readability -->
         <section class="dashboard-card" id="transactionHistory" style="border-left-color: #00bcd4; margin-bottom: 40px;">
             <h3><i class="fa-solid fa-list-check"></i> Recent Transaction History</h3>
-            <p style="margin-bottom: 20px; color: #666; font-style: italic;">
-                Structured tables with search, filter, and pagination are essential for readability when lists are large.
-            </p>
-
             <div class="data-table-container">
                 <!-- Mock Search/Filter Bar to improve convenience -->
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
@@ -385,6 +479,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Mock transaction data remains, as user only requested dealer list to be dynamic -->
                             <tr>
                                 <td>#JMTS1008</td>
                                 <td>2025-10-01</td>
@@ -469,7 +564,14 @@
         
     </div>
     
-    <script>
+    <script type="module">
+        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL VARIABLES (Must match those defined in the <script type="module"> block above) ---
+        let db;
+        let userId = null;
+        let dealerList = []; 
+        
         // DOM ELEMENTS for Dealer Management
         const dealerListDisplay = document.getElementById('dealerListDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
@@ -478,13 +580,6 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const formMessage = document.getElementById('formMessage');
 
-        // MOCK DATA for multiple dealers (Replace with actual API fetch)
-        let dealerList = [
-            { id: 1, company_name: "Apex Traders", contact_person: "Rajesh Kumar", phone_number: "9876543210", gstin_number: "GST12345", address: "Mumbai, Maharashtra" },
-            { id: 2, company_name: "Gauri Steels", contact_person: "Priya Sharma", phone_number: "9000111222", gstin_number: "GST67890", address: "Pune, Maharashtra" },
-            { id: 3, company_name: "Shinde Hardware", contact_person: "Vijay Shinde", phone_number: "8888777666", gstin_number: "GST54321", address: "Nagpur, Maharashtra" }
-        ];
-        let nextDealerId = 4; // Used for mock adding a new dealer
         let editingDealerId = null; // Tracks which dealer is being edited/added
 
         // Helper function to show form messages
@@ -497,12 +592,12 @@
             }, 5000);
         }
 
-        // Renders the list of dealers into a table
+        // Renders the list of dealers into a table (called by onSnapshot)
         function renderDealerList() {
             loadingMessage.style.display = 'none';
 
             if (dealerList.length === 0) {
-                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
+                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #8e24aa; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
                 return;
             }
 
@@ -522,14 +617,20 @@
             `;
 
             dealerList.forEach(dealer => {
+                // Ensure data fields are sanitized for display
+                const companyName = dealer.company_name || 'N/A';
+                const contactPerson = dealer.contact_person || 'N/A';
+                const phoneNumber = dealer.phone_number || 'N/A';
+                const gstinNumber = dealer.gstin_number || 'N/A';
+
                 tableHTML += `
                     <tr>
-                        <td>${dealer.company_name}</td>
-                        <td>${dealer.contact_person || 'N/A'}</td>
-                        <td>${dealer.phone_number}</td>
-                        <td>${dealer.gstin_number || 'N/A'}</td>
+                        <td>${companyName}</td>
+                        <td>${contactPerson}</td>
+                        <td>${phoneNumber}</td>
+                        <td>${gstinNumber}</td>
                         <td style="text-align: center;">
-                            <button class="dealer-action-btn" title="Edit Dealer" onclick="openDealerForm(${dealer.id})">
+                            <button class="dealer-action-btn" title="Edit Dealer" onclick="openDealerForm('${dealer.id}')">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                         </td>
@@ -551,9 +652,11 @@
             formMessage.style.display = 'none';
             editingDealerId = dealerId;
 
-            if (dealerId !== null) {
+            if (dealerId !== null && dealerId !== 'null') {
                 // EDIT MODE
                 const dealer = dealerList.find(d => d.id === dealerId);
+                if (!dealer) return; 
+
                 formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
                 
                 // Populate the form fields
@@ -578,50 +681,75 @@
             editingDealerId = null;
             dealerFormCard.style.display = 'none';
             document.getElementById('dealerManagementCard').style.display = 'block';
-            renderDealerList(); 
         }
-
+        
         // Handle form submission (Add or Edit)
-        detailsForm.addEventListener('submit', function(e) {
+        detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            if (!db || !userId) {
+                showMessage('error', 'Database not ready. Please wait for initialization.');
+                return;
+            }
+
             const formData = {
-                company_name: document.getElementById('companyName').value,
-                contact_person: document.getElementById('contactPerson').value,
-                phone_number: document.getElementById('phoneNumber').value,
-                gstin_number: document.getElementById('gstinNumber').value,
-                address: document.getElementById('address').value
+                company_name: document.getElementById('companyName').value.trim(),
+                contact_person: document.getElementById('contactPerson').value.trim(),
+                phone_number: document.getElementById('phoneNumber').value.trim(),
+                gstin_number: document.getElementById('gstinNumber').value.trim(),
+                address: document.getElementById('address').value.trim()
             };
             
-            showMessage('loading', 'Saving dealer details...');
+            showMessage('loading', editingDealerId ? 'Updating dealer...' : 'Adding new dealer...');
 
-            // 🛑 MOCK API CALL START 🛑
-            setTimeout(() => {
-                if (editingDealerId !== null) {
-                    // EDIT LOGIC (MOCK)
-                    const index = dealerList.findIndex(d => d.id === editingDealerId);
-                    if (index !== -1) {
-                        dealerList[index] = { ...dealerList[index], ...formData };
-                        showMessage('success', 'Dealer updated successfully.');
-                    }
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
+                
+                if (editingDealerId) {
+                    // EDIT MODE: Update existing document
+                    const dealerRef = doc(db, collectionPath, editingDealerId);
+                    await setDoc(dealerRef, formData, { merge: true }); // Use merge to only update fields provided
+                    showMessage('success', 'Dealer updated successfully!');
                 } else {
-                    // ADD LOGIC (MOCK)
-                    const newDealer = { id: nextDealerId++, ...formData };
-                    dealerList.push(newDealer);
-                    showMessage('success', 'New dealer added successfully.');
+                    // ADD MODE: Create a new document
+                    const dealersCollectionRef = collection(db, collectionPath);
+                    await addDoc(dealersCollectionRef, formData);
+                    showMessage('success', 'New dealer added successfully!');
                 }
 
-                // In a real application, you would make an API call here (e.g., POST or PUT /api/dealers)
-                // and then call closeDealerForm() only upon success.
+                // Close form only after successful database operation
                 closeDealerForm(); 
-            }, 800);
-            // 🛑 MOCK API CALL END 🛑
+
+            } catch (error) {
+                console.error('Firestore save failed:', error);
+                showMessage('error', `Failed to save dealer: ${error.message}`);
+            }
         });
 
-        // 1. Initial Load:
-        // In a real application, you'd fetch the list from the server here:
-        // fetch('/api/dealers').then(res => res.json()).then(data => { dealerList = data; renderDealerList(); });
-        renderDealerList(); // Using mock data for immediate display
+        // This section handles assigning global variables defined in the initial script block
+        // to variables accessible within this scope and sets up the Firestore connection.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the global setup function exists and run it if not already run by window.onload
+            if (typeof window.setupFirebase === 'function') {
+                // Wait for the window.onload/setupFirebase to complete initialization
+                const checkInterval = setInterval(() => {
+                    // Access the initialized variables from the global scope (defined in the first script block)
+                    const globalDb = window.db;
+                    const globalUserId = window.userId;
+
+                    if (globalDb && globalUserId) {
+                        clearInterval(checkInterval);
+                        db = globalDb;
+                        userId = globalUserId;
+                        // The listener is set up automatically in the first script block's onAuthStateChanged
+                    }
+                }, 100);
+            } else {
+                loadingMessage.textContent = "Error: Firebase setup function not found.";
+            }
+        });
+
     </script>
 </body>
 </html>
