@@ -22,6 +22,11 @@
       <source src="/Images/Jmts_video.mov" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+    
+    <button class="login-trigger-button" onclick="document.getElementById('loginModal').style.display='flex'">
+        <i class="fa-solid fa-user-lock"></i> Partner Login
+    </button>
+    
     <div class="hero-content">
       <img 
           src="/Images/logo_wires.png" 
@@ -38,8 +43,10 @@
     </div>
   </section>
 
-  <section class="login-page" id="partner-login">
+  <div id="loginModal" class="modal">
     <div class="login-box">
+      <span class="close-btn" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+      
       <h2 class="login-heading">Partner Login</h2> 
       <p class="subtitle">Secure access for registered dealers.</p>
       
@@ -74,7 +81,7 @@
         <a href="#" class="forgot-password">Forgot Password?</a>
       </form>
     </div>
-  </section>
+  </div>
   <section class="products" id="products">
     <h2>Our Products</h2>
     <div class="product-grid">
@@ -155,7 +162,7 @@
             </div>
 
             <div style="margin-top: 30px;">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15112.983935275815!2d75.86797746592275!3d19.82421453472061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdaa02641a96575%3A0x15359a35a7203a98!2sJalna%20MIDC%20Industrial%20Area!5e0!3m2!1sen!2sin!4v1699944000000" width="100%" height="250" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15004.991230198086!2d75.87538965!3d19.86617065!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bda3b3f2f5f5f5f%3A0x6b8f7d9c6c2b1a8d!2sMIDC%20Jalna!5e0!3m2!1sen!2sin!4v1694936000000!5m2!1sen!2sin" width="100%" height="250" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
             </div>
 
         </div>
