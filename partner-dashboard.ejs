@@ -5,104 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
-    <!-- Firebase SDK Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // --- GLOBAL SETUP ---
-        setLogLevel('Debug'); // Enable Firestore logging
-        
-        // Canvas Global Variables (MANDATORY USE)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db;
-        let auth;
-        let userId = null;
-        let dealerList = []; // Will hold the real-time data
-        let isAuthReady = false;
-
-        // Function to initialize and authenticate
-        async function setupFirebase() {
-            try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase config is missing.");
-                    return;
-                }
-                
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                // Use custom token if provided, otherwise sign in anonymously
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // Wait for the auth state to resolve
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        isAuthReady = true;
-                        // Start the database listener only after auth is ready
-                        setupDealerListener(); 
-                    } else {
-                        // This case should ideally not happen if auth is successful
-                        userId = crypto.randomUUID(); 
-                        isAuthReady = true;
-                        document.getElementById('loadingMessage').textContent = "User session is ready (Anonymous).";
-                        // Optionally still call listener, but rules might block anonymous access
-                        setupDealerListener(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase setup failed:", error);
-                document.getElementById('loadingMessage').textContent = "Failed to connect to the database.";
-            }
-        }
-        
-        // Function to set up the real-time listener for the dealer list
-        function setupDealerListener() {
-            if (!isAuthReady || !userId) return;
-
-            const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
-            const dealersCollectionRef = collection(db, collectionPath);
-
-            // onSnapshot provides real-time updates to the dealerList array
-            onSnapshot(dealersCollectionRef, (snapshot) => {
-                dealerList = [];
-                snapshot.forEach((doc) => {
-                    // Store the document ID with the data for update/delete operations
-                    dealerList.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Re-render the UI whenever the data changes
-                renderDealerList();
-            }, (error) => {
-                console.error("Error fetching dealers:", error);
-                document.getElementById('dealerListDisplay').innerHTML = 
-                    `<p style="text-align: center; color: #d32f2f;">
-                        Error loading data. Check console for details.
-                    </p>`;
-            });
-        }
-        
-        // Expose global functions to be called by HTML buttons/form (mandatory for EJS)
-        window.setupFirebase = setupFirebase;
-        window.openDealerForm = openDealerForm;
-        window.closeDealerForm = closeDealerForm;
-
-        // Run setup on load
-        window.onload = setupFirebase;
-
-    </script>
-
     <!-- Link to your main stylesheet for consistent styling -->
     <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -479,7 +381,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Mock transaction data remains, as user only requested dealer list to be dynamic -->
+                            <!-- Mock transaction data remains -->
                             <tr>
                                 <td>#JMTS1008</td>
                                 <td>2025-10-01</td>
@@ -564,25 +466,104 @@
         
     </div>
     
+    <!-- CONSOLIDATED JAVASCRIPT & FIREBASE LOGIC -->
     <script type="module">
-        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- GLOBAL VARIABLES (Must match those defined in the <script type="module"> block above) ---
-        let db;
-        let userId = null;
-        let dealerList = []; 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // DOM ELEMENTS for Dealer Management
+        // --- GLOBAL STATE VARIABLES ---
+        setLogLevel('Debug'); // Enable Firestore logging
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db = null;
+        let userId = null;
+        let dealerList = []; // Real-time array of dealer documents
+        let editingDealerId = null; // Tracks which dealer is being edited/added
+
+        // --- DOM ELEMENTS ---
         const dealerListDisplay = document.getElementById('dealerListDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
         const detailsForm = document.getElementById('detailsForm');
         const formTitle = document.getElementById('formTitle');
         const loadingMessage = document.getElementById('loadingMessage');
         const formMessage = document.getElementById('formMessage');
+        
+        // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
 
-        let editingDealerId = null; // Tracks which dealer is being edited/added
+        async function setupFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing.");
+                    loadingMessage.textContent = "Error: Firebase configuration missing.";
+                    return;
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+                
+                // 1. Sign in the user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-        // Helper function to show form messages
+                // 2. Wait for auth state change to get the userId and start listening
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        // 3. Once we have the user ID, start the real-time listener
+                        setupDealerListener(); 
+                    } else {
+                        // Fallback or error state if auth failed
+                        console.error("Authentication failed. Cannot access user-specific data.");
+                        userId = 'anonymous'; // Use a generic ID if needed, though security rules might block access
+                        loadingMessage.textContent = "Error: Failed to authenticate user.";
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase setup failed:", error);
+                loadingMessage.textContent = `Failed to connect to the database: ${error.message}`;
+            }
+        }
+        
+        // --- REAL-TIME DATA LISTENER ---
+
+        function setupDealerListener() {
+            if (!db || !userId) return;
+
+            const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
+            const dealersCollectionRef = collection(db, collectionPath);
+            
+            loadingMessage.textContent = "Loading dealers in real-time...";
+
+            // onSnapshot keeps the local 'dealerList' synchronized with Firestore
+            onSnapshot(dealersCollectionRef, (snapshot) => {
+                dealerList = [];
+                snapshot.forEach((doc) => {
+                    // Store the document ID with the data for update/delete operations
+                    dealerList.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Re-render the UI whenever the data changes
+                renderDealerList();
+            }, (error) => {
+                console.error("Error fetching dealers:", error);
+                dealerListDisplay.innerHTML = 
+                    `<p style="text-align: center; color: #d32f2f;">
+                        Error loading dealer data. Check console for details.
+                    </p>`;
+            });
+        }
+        
+        // --- UI RENDER & UTILITIES ---
+        
         function showMessage(type, message) {
             formMessage.textContent = message;
             formMessage.className = 'message-box ' + type;
@@ -592,7 +573,6 @@
             }, 5000);
         }
 
-        // Renders the list of dealers into a table (called by onSnapshot)
         function renderDealerList() {
             loadingMessage.style.display = 'none';
 
@@ -617,7 +597,6 @@
             `;
 
             dealerList.forEach(dealer => {
-                // Ensure data fields are sanitized for display
                 const companyName = dealer.company_name || 'N/A';
                 const contactPerson = dealer.contact_person || 'N/A';
                 const phoneNumber = dealer.phone_number || 'N/A';
@@ -630,7 +609,7 @@
                         <td>${phoneNumber}</td>
                         <td>${gstinNumber}</td>
                         <td style="text-align: center;">
-                            <button class="dealer-action-btn" title="Edit Dealer" onclick="openDealerForm('${dealer.id}')">
+                            <button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealer.id}')">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                         </td>
@@ -647,14 +626,15 @@
         }
 
         // Opens the form for adding (null) or editing (dealer ID)
-        function openDealerForm(dealerId = null) {
+        window.openDealerForm = function(dealerId = null) {
             detailsForm.reset();
             formMessage.style.display = 'none';
-            editingDealerId = dealerId;
+            // Use 'null' string if passed from HTML/onclick, otherwise check for actual null
+            editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
-            if (dealerId !== null && dealerId !== 'null') {
+            if (editingDealerId) {
                 // EDIT MODE
-                const dealer = dealerList.find(d => d.id === dealerId);
+                const dealer = dealerList.find(d => d.id === editingDealerId);
                 if (!dealer) return; 
 
                 formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
@@ -677,13 +657,15 @@
         }
         
         // Closes the form and returns to the list view
-        function closeDealerForm() {
+        window.closeDealerForm = function() {
             editingDealerId = null;
             dealerFormCard.style.display = 'none';
             document.getElementById('dealerManagementCard').style.display = 'block';
+            // List rerenders automatically via onSnapshot
         }
         
-        // Handle form submission (Add or Edit)
+        // --- FORM SUBMISSION HANDLER ---
+        
         detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -703,13 +685,12 @@
             showMessage('loading', editingDealerId ? 'Updating dealer...' : 'Adding new dealer...');
 
             try {
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
                 
                 if (editingDealerId) {
                     // EDIT MODE: Update existing document
                     const dealerRef = doc(db, collectionPath, editingDealerId);
-                    await setDoc(dealerRef, formData, { merge: true }); // Use merge to only update fields provided
+                    await setDoc(dealerRef, formData, { merge: true });
                     showMessage('success', 'Dealer updated successfully!');
                 } else {
                     // ADD MODE: Create a new document
@@ -727,29 +708,9 @@
             }
         });
 
-        // This section handles assigning global variables defined in the initial script block
-        // to variables accessible within this scope and sets up the Firestore connection.
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if the global setup function exists and run it if not already run by window.onload
-            if (typeof window.setupFirebase === 'function') {
-                // Wait for the window.onload/setupFirebase to complete initialization
-                const checkInterval = setInterval(() => {
-                    // Access the initialized variables from the global scope (defined in the first script block)
-                    const globalDb = window.db;
-                    const globalUserId = window.userId;
-
-                    if (globalDb && globalUserId) {
-                        clearInterval(checkInterval);
-                        db = globalDb;
-                        userId = globalUserId;
-                        // The listener is set up automatically in the first script block's onAuthStateChanged
-                    }
-                }, 100);
-            } else {
-                loadingMessage.textContent = "Error: Firebase setup function not found.";
-            }
-        });
-
+        // 4. Start the application setup when the window loads
+        window.onload = setupFirebase;
+        
     </script>
 </body>
 </html>
