@@ -291,13 +291,12 @@
                     alt="Shree JMTS Wires & Nails Logo" 
                     class="logo-wires"
                 >
-                <!-- EJS INJECTION -->
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
             <div class="user-info">
                 <p style="margin: 0; font-weight: 700; color: #1a237e;">Your User ID:</p>
-                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Loading...</code>
+                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Authentication Success</code> 
                 <div class="logout-form">
                     <form action="/auth/logout" method="POST">
                         <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
@@ -309,7 +308,6 @@
 
     <div class="dashboard-content">
         
-        <!-- Quick Stats / Summary Section -->
         <section class="dashboard-grid">
             <div class="dashboard-card" style="border-left-color: #4caf50;">
                 <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
@@ -330,31 +328,19 @@
             </div>
         </section>
 
-        <!-- DEALER MANAGEMENT SECTION (List View) -->
-        <section class="dashboard-card" id="dealerManagementCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
+        <section class="dashboard-card" id="myDetailsCard" style="border-left-color: #ff5722; margin-bottom: 40px;">
             <div class="section-header">
-                 <h3><i class="fa-solid fa-users-gear"></i> Manage Dealer Network </h3>
-                 <button 
-                    class="edit-toggle-btn" 
-                    id="addDealerButton" 
-                    onclick="openDealerForm(null)" 
-                    style="border-color: #4caf50; color: #4caf50;"
-                >
-                    <i class="fa-solid fa-plus"></i> Add New Dealer
-                </button>
-            </div>
+                 <h3><i class="fa-solid fa-address-card"></i> My Primary Dealer Details </h3>
+                 </div>
             <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
 
-            <!-- Dealer List Display Area -->
-            <div id="dealerListDisplay" style="margin-top: 15px;">
-                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Loading dealers in real-time...</p>
-                <!-- Table will be injected here by JavaScript -->
-            </div>
+            <div id="myDetailsDisplay" style="margin-top: 15px;">
+                <p style="color: #2196f3; text-align: center;">Loading your details...</p>
+                </div>
         </section>
 
-        <!-- DEALER ADD/EDIT FORM (Hidden by Default) -->
         <section class="dashboard-card" id="dealerFormCard" style="border-left-color: #ff9800; display: none;">
-            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Add New Dealer</h3>
+            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Set/Edit My Primary Details</h3>
 
             <form id="detailsForm" class="dealer-details-form">
                 <label for="companyName">Company Name <span style="color:red;">*</span></label>
@@ -375,19 +361,14 @@
                 <div class="message-box" id="formMessage" style="display: none;"></div>
 
                 <div class="form-action-buttons">
-                    <button type="submit" class="save-btn"><i class="fa-solid fa-save"></i> Save Dealer</button>
+                    <button type="submit" class="save-btn"><i class="fa-solid fa-save"></i> Save Details</button>
                     <button type="button" class="cancel-btn" onclick="closeDealerForm()"><i class="fa-solid fa-xmark"></i> Cancel</button>
                 </div>
             </form>
         </section>
-        <!-- END DEALER MANAGEMENT -->
-
-
-        <!-- TRANSACTION HISTORY SECTION for Data Readability -->
         <section class="dashboard-card" id="transactionHistory" style="border-left-color: #00bcd4; margin-bottom: 40px;">
             <h3><i class="fa-solid fa-list-check"></i> Recent Transaction History</h3>
             <div class="data-table-container">
-                <!-- Mock Search/Filter Bar to improve convenience -->
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                     <input type="text" placeholder="Search by Order ID or Product..." style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
                     <select style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
@@ -410,7 +391,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Mock transaction data remains -->
                             <tr>
                                 <td>#JMTS1008</td>
                             <td>2025-10-01</td>
@@ -450,7 +430,6 @@
         </section>
 
 
-        <!-- Product Pricing Section -->
         <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
             <h3><i class="fa-solid fa-tags"></i> Exclusive Partner Pricing (Current Rates)</h3>
             <ul>
@@ -474,7 +453,6 @@
             <a href="#" class="download-link"><i class="fa-solid fa-download"></i> Download Full Pricelist PDF</a>
         </section>
 
-        <!-- Distributor Documents Section -->
         <section class="dashboard-card" style="border-left-color: #607d8b;">
             <h3><i class="fa-solid fa-file-pdf"></i> Distributor Resources & Downloads</h3>
             <ul>
@@ -495,37 +473,17 @@
         
     </div>
     
-    <!-- FIREBASE IMPORTS (REQUIRED) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, setDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global environment variables provided by the Canvas hosting environment
-        // The ternary operator handles cases where the variables might not be defined during initial testing.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Firebase variables
-        let app;
-        let db;
-        let auth;
-        let userId = null;
-        let dealersCollectionRef = null; 
-
+    <script>
         // State and DOM elements
-        let dealerList = []; 
-        let editingDealerId = null; 
-
-        const dealerListDisplay = document.getElementById('dealerListDisplay');
+        let currentDealerDetails = {}; // Stores the single record fetched from the server
+        
+        // Get the new display element and existing form elements
+        const myDetailsDisplay = document.getElementById('myDetailsDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
         const detailsForm = document.getElementById('detailsForm');
         const formTitle = document.getElementById('formTitle');
         const formMessage = document.getElementById('formMessage');
-        const loadingMessage = document.getElementById('loadingMessage');
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        
+
         // --- UI UTILITIES ---
         
         function showMessage(type, message) {
@@ -536,166 +494,99 @@
                 formMessage.style.display = 'none';
             }, 5000);
         }
-
-        function renderDealerList() {
-            if (dealerList.length === 0) {
-                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #8e24aa; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
-                return;
-            }
-
-            let tableHTML = `
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Company Name</th>
-                                <th>Contact Person</th>
-                                <th>Phone</th>
-                                <th>GSTIN</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            dealerList.forEach(dealer => {
-                const companyName = dealer.company_name || 'N/A';
-                const contactPerson = dealer.contact_person || 'N/A';
-                const phoneNumber = dealer.phone_number || 'N/A';
-                const gstinNumber = dealer.gstin_number || 'N/A';
-
-                // We must use the global window.openDealerForm function for onclick events
-                tableHTML += `
-                    <tr>
-                        <td>${companyName}</td>
-                        <td>${contactPerson}</td>
-                        <td>${phoneNumber}</td>
-                        <td>${gstinNumber}</td>
-                        <td style="text-align: center;">
-                            <button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealer.id}')">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                        </td>
-                    </tr>
+        
+        // --- FUNCTION: Renders the single dealer details record ---
+        function renderMyDetails() {
+            if (Object.keys(currentDealerDetails).length === 0) {
+                // Case: No details found for this user
+                myDetailsDisplay.innerHTML = `
+                    <p style="text-align: center; color: #ff5722; font-style: italic; margin-bottom: 20px;">
+                        Your primary dealer details are not set. Click the button to save them.
+                    </p>
+                    <button 
+                        class="edit-toggle-btn" 
+                        onclick="openDealerForm()" 
+                        style="border-color: #ff9800; color: #ff9800; display: block; margin: 0 auto; padding: 10px 20px;"
+                    >
+                        <i class="fa-solid fa-address-card"></i> Set My Details Now
+                    </button>
                 `;
-            });
-
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            dealerListDisplay.innerHTML = tableHTML;
+            } else {
+                // Case: Details found, display them
+                const d = currentDealerDetails;
+                myDetailsDisplay.innerHTML = `
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" style="margin-bottom: 20px; font-size: 1em;">
+                            <tbody>
+                                <tr><th style="width: 30%; background-color: #f7f7f7;">Company Name</th><td>${d.company_name || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Contact Person</th><td>${d.contact_person || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Phone Number</th><td>${d.phone_number || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">GSTIN / Tax ID</th><td>${d.gstin_number || 'N/A'}</td></tr>
+                                <tr><th style="background-color: #f7f7f7;">Address</th><td>${d.address ? d.address.replace(/\n/g, '<br>') : 'N/A'}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button 
+                        class="edit-toggle-btn" 
+                        onclick="openDealerForm()" 
+                        style="border-color: #2196f3; color: #2196f3; display: block; margin-left: auto; padding: 8px 15px;"
+                    >
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                    </button>
+                `;
+            }
         }
 
-        // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
 
-        async function initFirebaseAndLoadData() {
-            setLogLevel('Debug'); // Enable Firebase debug logging
-
-            if (!firebaseConfig) {
-                console.error("Firebase config is missing. Cannot initialize Firestore.");
-                loadingMessage.style.display = 'none';
-                userIdDisplay.textContent = 'Auth Failed (No Config)';
-                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Database connection failed: Configuration missing.</p>';
-                return;
-            }
-
+        // --- FUNCTION: Fetches the single dealer details record from Express API ---
+        async function loadDealerDetails() {
+            myDetailsDisplay.innerHTML = '<p style="color: #2196f3; text-align: center;">Loading your details...</p>';
             try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+                // Use the Express GET API route
+                const response = await fetch('/api/dealer-details');
+                const data = await response.json();
                 
-                // 1. Authentication
-                let userCredential;
-                if (initialAuthToken) {
-                    userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                if (response.ok && data.success && data.details) {
+                    currentDealerDetails = data.details;
                 } else {
-                    userCredential = await signInAnonymously(auth);
+                    currentDealerDetails = {}; // Details not set yet or unauthorized
                 }
-
-                userId = userCredential.user.uid;
-                userIdDisplay.textContent = userId;
+                renderMyDetails();
                 
-                // 2. Define the data path for private user data
-                const collectionPath = `/artifacts/${appId}/users/${userId}/dealers`;
-                dealersCollectionRef = collection(db, collectionPath);
-                
-                // 3. Start listening for real-time updates
-                setupRealtimeListener();
-
             } catch (error) {
-                console.error("Firebase Initialization or Authentication failed:", error);
-                loadingMessage.style.display = 'none';
-                userIdDisplay.textContent = 'Auth Error';
-                dealerListDisplay.innerHTML = `<p style="text-align: center; color: #d32f2f; font-weight: 700;">Connection Error: Authentication failed. See console.</p>`;
+                console.error("Error loading dealer details:", error);
+                myDetailsDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f;">Failed to load details due to server error.</p>';
             }
         }
         
-        // --- REAL-TIME DATA LISTENER ---
-        
-        function setupRealtimeListener() {
-            if (!dealersCollectionRef) return;
-
-            loadingMessage.style.display = 'block';
-            const q = query(dealersCollectionRef);
-            
-            // Set up the real-time listener using onSnapshot
-            onSnapshot(q, (snapshot) => {
-                // Map Firestore documents to a local dealer list structure
-                dealerList = snapshot.docs.map(doc => ({
-                    id: doc.id, // Firestore document ID
-                    ...doc.data()
-                }));
-                
-                // Re-render the list immediately whenever data changes
-                renderDealerList(); 
-                loadingMessage.style.display = 'none';
-
-            }, (error) => {
-                console.error("Error setting up real-time listener:", error);
-                loadingMessage.style.display = 'none';
-                dealerListDisplay.innerHTML = `<p style="text-align: center; color: #d32f2f; font-weight: 700;">Real-time update failed: ${error.message}</p>`;
-            });
-        }
-
 
         // --- UI & FORM LOGIC (Exposed to Global Scope for HTML onClick) ---
 
-        window.openDealerForm = function(dealerId = null) {
+        window.openDealerForm = function() {
             detailsForm.reset();
             formMessage.style.display = 'none';
-            // Use 'null' string if passed from HTML/onclick, otherwise check for actual null
-            editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
-            if (editingDealerId) {
-                // EDIT MODE
-                const dealer = dealerList.find(d => d.id === editingDealerId);
-                if (!dealer) return; 
-
-                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
-                
+            // Set form title and populate fields based on current state
+            if (Object.keys(currentDealerDetails).length > 0) {
+                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit My Dealer Details`;
                 // Populate the form fields
-                document.getElementById('companyName').value = dealer.company_name || '';
-                document.getElementById('contactPerson').value = dealer.contact_person || '';
-                document.getElementById('phoneNumber').value = dealer.phone_number || '';
-                document.getElementById('gstinNumber').value = dealer.gstin_number || '';
-                document.getElementById('address').value = dealer.address || '';
-
+                document.getElementById('companyName').value = currentDealerDetails.company_name || '';
+                document.getElementById('contactPerson').value = currentDealerDetails.contact_person || '';
+                document.getElementById('phoneNumber').value = currentDealerDetails.phone_number || '';
+                document.getElementById('gstinNumber').value = currentDealerDetails.gstin_number || '';
+                document.getElementById('address').value = currentDealerDetails.address || '';
             } else {
-                // ADD MODE
-                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Add New Dealer`;
+                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Set My Primary Dealer Details`;
             }
 
             // Toggle UI visibility
-            document.getElementById('dealerManagementCard').style.display = 'none';
+            document.getElementById('myDetailsCard').style.display = 'none';
             dealerFormCard.style.display = 'block';
         }
         
         window.closeDealerForm = function() {
-            editingDealerId = null;
             dealerFormCard.style.display = 'none';
-            document.getElementById('dealerManagementCard').style.display = 'block';
+            document.getElementById('myDetailsCard').style.display = 'block';
         }
         
         // --- FORM SUBMISSION HANDLER ---
@@ -703,41 +594,52 @@
         detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!db || !dealersCollectionRef) {
-                showMessage('error', 'Database not connected. Please refresh and try again.');
+            const formData = {
+                companyName: document.getElementById('companyName').value.trim(),
+                contactPerson: document.getElementById('contactPerson').value.trim(),
+                phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                gstinNumber: document.getElementById('gstinNumber').value.trim(),
+                address: document.getElementById('address').value.trim(),
+            };
+
+            // Basic client-side validation for required fields
+            if (!formData.companyName || !formData.phoneNumber) {
+                showMessage('error', 'Company Name and Phone Number are required fields.');
                 return;
             }
 
-            const formData = {
-                company_name: document.getElementById('companyName').value.trim(),
-                contact_person: document.getElementById('contactPerson').value.trim(),
-                phone_number: document.getElementById('phoneNumber').value.trim(),
-                gstin_number: document.getElementById('gstinNumber').value.trim(),
-                address: document.getElementById('address').value.trim(),
-                updated_at: new Date().toISOString()
-            };
+            showMessage('loading', 'Saving details...');
             
             try {
-                if (editingDealerId) {
-                    // EDIT MODE: Use setDoc on the existing document reference
-                    const dealerRef = doc(db, dealersCollectionRef.path, editingDealerId);
-                    await setDoc(dealerRef, formData, { merge: true }); // Merge ensures only these fields are updated
-                    showMessage('success', 'Dealer updated successfully!');
+                // Use POST to the UPSERT API route
+                const response = await fetch('/api/dealer-details', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', data.message);
+                    // Update local state and trigger a re-render from the saved data
+                    currentDealerDetails = data.details;
+                    renderMyDetails(); 
+                    closeDealerForm();
                 } else {
-                    // ADD MODE: Use addDoc to create a new document with an auto-generated ID
-                    await addDoc(dealersCollectionRef, formData);
-                    showMessage('success', 'New dealer added successfully!');
+                    showMessage('error', data.message || 'Failed to save details. Try again.');
                 }
                 
-                closeDealerForm(); 
             } catch (error) {
                 console.error("Error saving dealer:", error);
-                showMessage('error', `Failed to save dealer: ${error.message}`);
+                showMessage('error', `Failed to save details: Server connection error.`);
             }
         });
 
-        // Start the application by initializing Firebase and loading dealers
-        window.onload = initFirebaseAndLoadData;
+        // Start the application by loading dealer details
+        window.onload = loadDealerDetails;
         
     </script>
 </body>

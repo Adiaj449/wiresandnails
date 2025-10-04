@@ -8,7 +8,6 @@ const pgSession = require('connect-pg-simple')(session);
 const app = express();
 
 // CRITICAL FIX FOR RAILWAY/PROXY: Trust the proxy headers for secure cookies
-// This allows secure cookies to work when deployed behind a proxy/load balancer.
 app.set('trust proxy', 1); 
 
 // 🛑 EJS CONFIGURATION 🛑
@@ -161,8 +160,10 @@ app.get('/api/dealer-details', async (req, res) => {
         );
         
         if (result.rows.length > 0) {
+            // Send back the single record
             res.json({ success: true, details: result.rows[0] });
         } else {
+            // Success, but no details found (user hasn't set them yet)
             res.json({ success: false, message: 'No details found.' });
         }
     } catch (error) {
@@ -185,8 +186,7 @@ app.post('/api/dealer-details', async (req, res) => {
     }
 
     try {
-        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature to insert a new row 
-        // if user_id doesn't exist, or update it if it does.
+        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature
         const result = await pool.query(
             `INSERT INTO dealer_details (user_id, company_name, contact_person, phone_number, gstin_number, address) 
              VALUES ($1, $2, $3, $4, $5, $6)
@@ -204,6 +204,7 @@ app.post('/api/dealer-details', async (req, res) => {
         res.json({ 
             success: true, 
             message: 'Dealer details saved successfully.',
+            // Return the saved details to update the client-side state immediately
             details: result.rows[0]
         });
         
