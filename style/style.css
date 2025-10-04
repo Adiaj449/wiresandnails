@@ -4,11 +4,25 @@ padding: 0;
 box-sizing: border-box;
 }
 
+
 body {
-font-family: 'Poppins', sans-serif;
-line-height: 1.6;
-color: #333;
-background-color: #fff;
+/* Default for body and paragraphs */
+font-family: 'Montserrat', sans-serif;
+color: #333; /* Good readability */
+}
+
+h1 {
+/* Use a bold weight for the main heading */
+font-family: 'Montserrat', sans-serif;
+font-weight: 700; /* Bold */
+font-size: 2.5em; /* Large size */
+color: #0056b3; /* Or an industrial color like dark blue or gray */
+}
+
+a {
+/* Ensure call-to-action link is also clear */
+font-family: 'Montserrat', sans-serif;
+font-weight: 700; 
 }
 
 #main-logo-override {
