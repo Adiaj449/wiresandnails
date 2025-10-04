@@ -1,224 +1,296 @@
+// FILE: server.js
+
+require('dotenv').config();
 const express = require('express');
-const session = require('express-session');
 const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-const path = require('path');
-const pgSession = require('connect-pg-simple')(session); 
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const connectPgSimple = require('connect-pg-simple');
 
 const app = express();
+const port = 3000;
 
-// CRITICAL FIX FOR RAILWAY/PROXY: Trust the proxy headers for secure cookies
-app.set('trust proxy', 1); 
+// Set EJS as the templating engine
+app.set('view engine', 'ejs');
 
-// 🛑 EJS CONFIGURATION 🛑
-app.set('views', __dirname); 
-app.set('view engine', 'ejs'); 
-
-const port = process.env.PORT || 3000; 
-
-// ==============================================
-// 1. DATABASE CONFIGURATION
-// ==============================================
-// Connects to the PostgreSQL database using environment variables
+// --- DATABASE CONFIGURATION ---
 const pool = new Pool({
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
-    database: process.env.DB_NAME || 'railway',
-    password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
-    port: process.env.DB_PORT || 52101,
-    ssl: {
-        rejectUnauthorized: false // Required for platforms like Railway with self-signed certs
-    }
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// ==============================================
-// 2. MIDDLEWARE SETUP
-// ==============================================
+// --- MIDDLEWARE ---
 
-// Serve static files (like CSS, images, client-side JS)
-app.use(express.static(__dirname));
-app.use(express.urlencoded({ extended: true })); // Handle form submissions
-app.use(express.json()); // Handle JSON payloads for API routes
+// Serve static files from the 'public' directory
+app.use(express.static('public')); 
+app.use('/style', express.static('style'));
+app.use('/Images', express.static('Images'));
 
-// Session Middleware Configuration
+// Parse URL-encoded bodies (for form submissions)
+app.use(express.urlencoded({ extended: true }));
+// Parse JSON bodies (for API calls)
+app.use(express.json());
+
+// Configure session management
+const PgStore = connectPgSimple(session);
 app.use(session({
-    store: new pgSession({
-        pool: pool,          
-        tableName: 'session' // Must match the table created in your database
+    store: new PgStore({
+        pool: pool,
+        tableName: 'session' // A table named 'session' must be created in your DB
     }),
-    secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
-    resave: false, 
+    secret: process.env.SESSION_SECRET || 'your_secret_key', // USE A STRONG SECRET IN .env
+    resave: false,
     saveUninitialized: false,
     cookie: { 
-        maxAge: 1000 * 60 * 60 * 24, // 24 hours
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false // Required for cross-site access in production
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        secure: process.env.NODE_ENV === 'production' // Use secure cookies in production
     }
 }));
 
+// --- SESSION/AUTHENTICATION MIDDLEWARE ---
 
-// ==============================================
-// 3. ROUTE HANDLERS
-// ==============================================
-
-// A. LANDING PAGE
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// B. LOGIN ROUTE (POST)
-app.post('/auth/login', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ success: false, message: 'Missing username or password.' });
-    }
-    try {
-        const result = await pool.query(
-            'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
-            [username]
-        );
-        const user = result.rows[0];
-        
-        // 1. Check if user exists and if password is correct
-        if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials. Please try again.' });
-        }
-
-        // 2. Set session variables
-        req.session.userId = user.id;
-        req.session.isPartner = user.is_partner;
-        
-        // 3. Save session and redirect
-        req.session.save(err => {
-            if (err) {
-                console.error('Session save error:', err);
-                return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
-            }
-            return res.json({ 
-                success: true, 
-                redirectUrl: '/partner/dashboard' 
-            });
-        });
-
-    } catch (error) {
-        console.error('Login database or bcrypt error:', error);
-        return res.status(500).json({ success: false, message: 'An unexpected server error occurred during login.' });
-    }
-});
-
-
-// C. PROTECTED DASHBOARD ROUTE (GET) - EJS RENDER
-app.get('/partner/dashboard', async (req, res) => {
-    // Check if user is logged in AND is a partner
-    if (req.session.userId && req.session.isPartner) {
-        try {
-            // Fetch the username for display in the EJS template
-            const userResult = await pool.query(
-                'SELECT username FROM users WHERE id = $1', 
-                [req.session.userId]
-            );
-            
-            const username = userResult.rows[0] ? userResult.rows[0].username : 'Partner';
-
-            // Render the EJS file and inject the username
-            res.render('partner-dashboard', { 
-                username: username 
-            });
-
-        } catch (error) {
-            console.error('Database fetch error on dashboard load:', error);
-            res.redirect('/');
-        }
+/**
+ * Middleware to ensure the user is logged in.
+ */
+const isAuthenticated = (req, res, next) => {
+    if (req.session.userId) {
+        next();
     } else {
-        // Not authorized or not logged in
+        // Redirect to the login page (which is the homepage here)
         res.redirect('/');
     }
+};
+
+/**
+ * Middleware to ensure the user is an admin.
+ */
+const isAdmin = (req, res, next) => {
+    if (req.session.isAdmin) {
+        next();
+    } else {
+        // Logged in but not an admin (i.e., a regular partner)
+        res.status(403).send('Access Denied: You must be an Administrator.');
+    }
+};
+
+// --- ROUTES ---
+
+// 1. Homepage / Login Page
+app.get('/', (req, res) => {
+    // If the user is already logged in, redirect them to the dashboard
+    if (req.session.userId) {
+        return res.redirect('/dashboard');
+    }
+    // Render the public landing page (index.html is assumed to be the home page, 
+    // or you can render an EJS file if you rename index.html to index.ejs)
+    res.sendFile(__dirname + '/index.html'); 
 });
 
+// 2. Authentication Route
+app.post('/auth/login', async (req, res) => {
+    const { username, password } = req.body;
 
-// D. LOGOUT POST ROUTE
+    try {
+        const result = await pool.query('SELECT id, password_hash, is_admin FROM users WHERE username = $1', [username]);
+        const user = result.rows[0];
+
+        if (user && await bcrypt.compare(password, user.password_hash)) {
+            // Success: Set session variables
+            req.session.userId = user.id;
+            req.session.username = username;
+            req.session.isAdmin = user.is_admin; 
+            
+            // Send JSON response for the frontend JS to handle the redirect
+            return res.json({ 
+                success: true, 
+                message: 'Login successful', 
+                redirectUrl: '/dashboard' 
+            });
+        } else {
+            // Failure: Invalid credentials
+            return res.json({ 
+                success: false, 
+                message: 'Invalid Username or Password.' 
+            });
+        }
+    } catch (err) {
+        console.error('Login Error:', err);
+        return res.json({ 
+            success: false, 
+            message: 'A server error occurred during login.' 
+        });
+    }
+});
+
+// 3. Logout Route
 app.post('/auth/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            console.error('Logout error:', err);
+            console.error('Session destruction error:', err);
             return res.status(500).send('Could not log out.');
         }
         res.redirect('/');
     });
 });
 
-// E. API Route to FETCH Dealer Details (GET)
-app.get('/api/dealer-details', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized' });
+// 4. Dashboard Route (Secured)
+app.get('/dashboard', isAuthenticated, (req, res) => {
+    // Render the dashboard with user-specific data
+    res.render('partner-dashboard', {
+        username: req.session.username,
+        userId: req.session.userId,
+        isAdmin: req.session.isAdmin
+    });
+});
+
+// ----------------------------------------
+// 5. DEALER NETWORK API ROUTES (CRUD)
+// ----------------------------------------
+
+// A. GET /api/dealers: Fetch all dealers (Admin) OR only own dealers (Partner)
+app.get('/api/dealers', isAuthenticated, async (req, res) => {
+    const isAdminUser = req.session.isAdmin;
+    const partnerId = req.session.userId;
+
+    let query;
+    let params = [];
+
+    if (isAdminUser) {
+        // Admin sees ALL dealers
+        query = `
+            SELECT 
+                d.id, d.company_name, d.contact_person, d.phone_number, d.gstin_number, d.address, d.created_at,
+                u.username AS partner_username
+            FROM dealer_network d
+            JOIN users u ON d.partner_user_id = u.id
+            ORDER BY d.id DESC;
+        `;
+    } else {
+        // Partner sees only their own dealers
+        query = `
+            SELECT 
+                id, company_name, contact_person, phone_number, gstin_number, address, created_at
+            FROM dealer_network
+            WHERE partner_user_id = $1
+            ORDER BY id DESC;
+        `;
+        params.push(partnerId);
     }
+
     try {
-        const result = await pool.query(
-            'SELECT company_name, contact_person, phone_number, gstin_number, address FROM dealer_details WHERE user_id = $1',
-            [req.session.userId]
-        );
-        
-        if (result.rows.length > 0) {
-            // Send back the single record
-            res.json({ success: true, details: result.rows[0] });
-        } else {
-            // Success, but no details found (user hasn't set them yet)
-            res.json({ success: false, message: 'No details found.' });
-        }
-    } catch (error) {
-        console.error('Error fetching dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error fetching details.' });
+        const result = await pool.query(query, params);
+        res.json({ success: true, dealers: result.rows });
+    } catch (err) {
+        console.error('Error fetching dealer network:', err);
+        res.status(500).json({ success: false, message: 'Failed to retrieve dealer network data.' });
     }
 });
 
-// F. API Route to SAVE/UPDATE Dealer Details (POST - UPSERT)
-app.post('/api/dealer-details', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+// B. POST /api/dealers: Create or Update (UPSERT) a dealer record
+app.post('/api/dealers', isAuthenticated, async (req, res) => {
+    const { id, companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
+    const partnerId = req.session.userId;
+    const isAdminUser = req.session.isAdmin;
+    let client;
+
+    // Basic validation
+    if (!companyName || !phoneNumber) {
+        return res.status(400).json({ success: false, message: 'Company Name and Phone Number are required.' });
+    }
+
+    // Determine if this is a CREATE (id is null/0) or UPDATE (id is valid)
+    const isUpdate = !!id && id !== 0; 
+    
+    // Check ownership for updates (Partners can only update their own)
+    if (isUpdate && !isAdminUser) {
+        try {
+            const check = await pool.query('SELECT partner_user_id FROM dealer_network WHERE id = $1', [id]);
+            if (check.rows.length === 0 || check.rows[0].partner_user_id !== partnerId) {
+                return res.status(403).json({ success: false, message: 'Access Denied: You can only edit dealers you created.' });
+            }
+        } catch(err) {
+            return res.status(500).json({ success: false, message: 'Error checking dealer ownership.' });
+        }
     }
     
-    // Data validation 
-    const { companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
-
-    if (!companyName || !phoneNumber) {
-        return res.status(400).json({ success: false, message: 'Company Name and Phone Number are required fields.' });
-    }
+    // UPSERT Query
+    // Note: We use COALESCE to safely treat a null/empty 'id' as a new record.
+    const upsertQuery = `
+        INSERT INTO dealer_network (id, partner_user_id, company_name, contact_person, phone_number, gstin_number, address)
+        VALUES (COALESCE($1, nextval('dealer_network_id_seq')), $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (id) DO UPDATE
+        SET 
+            company_name = EXCLUDED.company_name,
+            contact_person = EXCLUDED.contact_person,
+            phone_number = EXCLUDED.phone_number,
+            gstin_number = EXCLUDED.gstin_number,
+            address = EXCLUDED.address,
+            updated_at = NOW()
+        RETURNING *; 
+    `;
 
     try {
-        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature
-        const result = await pool.query(
-            `INSERT INTO dealer_details (user_id, company_name, contact_person, phone_number, gstin_number, address) 
-             VALUES ($1, $2, $3, $4, $5, $6)
-             ON CONFLICT (user_id) DO UPDATE
-             SET company_name = EXCLUDED.company_name,
-                 contact_person = EXCLUDED.contact_person,
-                 phone_number = EXCLUDED.phone_number,
-                 gstin_number = EXCLUDED.gstin_number,
-                 address = EXCLUDED.address,
-                 updated_at = CURRENT_TIMESTAMP
-             RETURNING company_name, contact_person, phone_number, gstin_number, address;`,
-            [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
-        );
+        const result = await pool.query(upsertQuery, [
+            isUpdate ? id : null, // Pass ID for update, null for new insert
+            partnerId,
+            companyName,
+            contactPerson,
+            phoneNumber,
+            gstinNumber,
+            address
+        ]);
+
+        const dealerRecord = result.rows[0];
+        const action = isUpdate ? 'updated' : 'added';
 
         res.json({ 
             success: true, 
-            message: 'Dealer details saved successfully.',
-            // Return the saved details to update the client-side state immediately
-            details: result.rows[0]
+            message: `Dealer ${dealerRecord.company_name} successfully ${action}.`,
+            dealer: dealerRecord
         });
-        
-    } catch (error) {
-        console.error('Error saving dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error saving details.' });
+
+    } catch (err) {
+        console.error('Error in dealer UPSERT:', err);
+        res.status(500).json({ success: false, message: 'Failed to save dealer details due to a database error.' });
     }
 });
 
 
-// ==============================================
-// 4. START THE SERVER
-// ==============================================
+// C. DELETE /api/dealers/:id: Delete a dealer record
+app.delete('/api/dealers/:id', isAuthenticated, async (req, res) => {
+    const dealerId = req.params.id;
+    const partnerId = req.session.userId;
+    const isAdminUser = req.session.isAdmin;
+    let client;
+
+    try {
+        // Partners can only delete their own dealers. Admin can delete any.
+        let query = 'DELETE FROM dealer_network WHERE id = $1';
+        let params = [dealerId];
+
+        if (!isAdminUser) {
+            query += ' AND partner_user_id = $2';
+            params.push(partnerId);
+        }
+
+        const result = await pool.query(query, params);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: 'Dealer not found or you do not have permission to delete it.' });
+        }
+
+        res.json({ success: true, message: 'Dealer deleted successfully.' });
+
+    } catch (err) {
+        console.error('Error deleting dealer:', err);
+        res.status(500).json({ success: false, message: 'Failed to delete dealer due to a server error.' });
+    }
+});
+
+
+// 6. Start Server
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    console.log(`Node environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Node.js environment: ${process.env.NODE_ENV}`);
 });
