@@ -12,17 +12,15 @@
     <style>
         /* DASHBOARD SPECIFIC STYLES */
         body {
-            background-color: #f4f7f6; /* Lighter background than the hero section */
+            background-color: #f4f7f6; 
             padding-top: 0;
         }
-        
-        /* 🎨 HEADER COLOR CHANGE: Now white/light gray background */
         .dashboard-header {
-            background-color: #ffffff; /* White background */
-            color: #1a237e; /* Text is Deep Indigo */
+            background-color: #ffffff;
+            color: #1a237e;
             padding: 20px 0;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 40px;
         }
         .dashboard-header .header-content {
@@ -33,28 +31,21 @@
             justify-content: space-between;
             padding: 0 20px;
         }
-
-        /* 🖼️ LOGO STYLES */
         .dashboard-header .logo-container {
             display: flex;
             align-items: center;
         }
         .dashboard-header .logo-container img {
-            height: 40px; /* Adjust size as needed */
+            height: 40px; 
             margin-right: 15px;
         }
         .dashboard-header h1 {
-            color: #1a237e; /* Keep the indigo color for the main heading */
+            color: #1a237e; 
             margin: 0;
-            font-size: 1.8em; /* Slightly smaller than the main hero heading */
+            font-size: 1.8em; 
         }
-        .dashboard-header p {
-            display: none; /* Hiding the subtitle for a cleaner top bar */
-        }
-        
         .logout-form {
-            /* Position changed from absolute to flow naturally in flex container */
-            margin-left: auto; /* Pushes the button to the far right */
+            margin-left: auto;
         }
         .logout-form button {
             background-color: #d32f2f;
@@ -83,7 +74,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             text-align: left;
-            border-left: 5px solid #ff9800; /* Amber accent */
+            border-left: 5px solid #ff9800;
         }
         .dashboard-card h3 {
             color: #1a237e;
@@ -126,7 +117,7 @@
                     alt="Shree JMTS Wires & Nails Logo" 
                     class="logo-wires"
                 >
-                <h1><i class="fa-solid fa-gauge-high"></i> Partner Dashboard</h1>
+                <h1>Welcome, <%= username %>!</h1>
             </div>
             
             <div class="logout-form">
@@ -202,5 +193,5 @@
         
     </div>
     
-    </body>
+</body>
 </html>
