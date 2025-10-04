@@ -14,7 +14,6 @@
         body {
             background-color: #f4f7f6; 
             padding-top: 0;
-            font-family: 'Roboto Condensed', sans-serif;
         }
         .dashboard-header {
             background-color: #ffffff;
@@ -44,21 +43,9 @@
             color: #1a237e; 
             margin: 0;
             font-size: 1.8em; 
-            font-weight: 700;
         }
-        .user-info {
-            text-align: right;
+        .logout-form {
             margin-left: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-        }
-        .user-info .user-id-text {
-            font-size: 0.8em;
-            color: #666;
-            word-break: break-all;
-            max-width: 250px;
         }
         .logout-form button {
             background-color: #d32f2f;
@@ -69,9 +56,6 @@
             cursor: pointer;
             font-weight: 700;
             transition: background-color 0.3s;
-        }
-        .logout-form button:hover {
-            background-color: #b71c1c;
         }
         .dashboard-content {
             max-width: 1200px;
@@ -87,11 +71,10 @@
         .dashboard-card {
             background: white;
             padding: 25px;
-            border-left: 5px solid #ff9800;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             text-align: left;
-            position: relative; 
+            border-left: 5px solid #ff9800;
         }
         .dashboard-card h3 {
             color: #1a237e;
@@ -100,9 +83,6 @@
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         .dashboard-card ul {
             list-style: none;
@@ -126,160 +106,6 @@
             font-weight: 700;
             text-decoration: none;
         }
-
-        /* Dealer Details / Management Styles */
-        .dealer-details-form {
-            padding: 10px 0;
-        }
-        
-        .dealer-details-form label {
-            display: block;
-            margin-top: 10px;
-            font-weight: 700;
-            color: #1a237e;
-        }
-
-        .dealer-details-form input, .dealer-details-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            box-sizing: border-box; 
-        }
-
-        .form-action-buttons {
-            margin-top: 20px;
-        }
-        .form-action-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            margin-right: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: background-color 0.2s;
-        }
-
-        .form-action-buttons .save-btn {
-            background-color: #4caf50; 
-            color: white;
-        }
-        .form-action-buttons .cancel-btn {
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        .form-action-buttons .save-btn:hover { background-color: #388e3c; }
-        .form-action-buttons .cancel-btn:hover { background-color: #ddd; }
-
-
-        .message-box {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: 700;
-        }
-        .message-box.success {
-            background-color: #e8f5e9;
-            color: #388e3c;
-        }
-        .message-box.error {
-            background-color: #ffebee;
-            color: #d32f2f;
-        }
-        .message-box.loading {
-            background-color: #e3f2fd;
-            color: #2196f3;
-        }
-
-        /* TABLE STYLES for Readability (used for both sections) */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-            text-align: left;
-        }
-
-        .data-table th, .data-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .data-table thead tr {
-            background-color: #e3f2fd; /* Light blue header */
-            color: #1a237e;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-        
-        .data-table tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.8em;
-            text-align: center;
-        }
-        .status-badge.pending {
-            background-color: #fff3e0;
-            color: #ff9800;
-        }
-        .status-badge.shipped {
-            background-color: #e3f2fd;
-            color: #2196f3;
-        }
-        .status-badge.delivered {
-            background-color: #e8f5e9;
-            color: #4caf50;
-        }
-
-        /* NEW: Dealer List Action Button */
-        .dealer-action-btn {
-            background: none;
-            border: none;
-            color: #1a237e;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 1.1em;
-            transition: color 0.2s;
-        }
-        .dealer-action-btn:hover {
-            color: #ff9800;
-        }
-        
-        /* New section header style for better button placement */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .section-header h3 {
-             border-bottom: none;
-             padding-bottom: 0;
-             margin-bottom: 0;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-header .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .dashboard-header .logo-container {
-                margin-bottom: 10px;
-            }
-            .user-info {
-                align-items: center;
-                text-align: center;
-                margin: 0;
-            }
-        }
     </style>
 </head>
 <body>
@@ -294,14 +120,10 @@
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
-            <div class="user-info">
-                <p style="margin: 0; font-weight: 700; color: #1a237e;">Your User ID:</p>
-                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Authentication Success</code> 
-                <div class="logout-form">
-                    <form action="/auth/logout" method="POST">
-                        <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
-                    </form>
-                </div>
+            <div class="logout-form">
+                <form action="/auth/logout" method="POST">
+                    <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                </form>
             </div>
         </div>
     </header>
@@ -312,7 +134,7 @@
             <div class="dashboard-card" style="border-left-color: #4caf50;">
                 <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
                 <p style="font-size: 2.5em; color: #4caf50; margin: 0;">03</p>
-                <a href="#transactionHistory" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             
             <div class="dashboard-card" style="border-left-color: #2196f3;">
@@ -327,108 +149,6 @@
                 <a href="#pricing" class="download-link">Full Price List <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </section>
-
-        <section class="dashboard-card" id="myDetailsCard" style="border-left-color: #ff5722; margin-bottom: 40px;">
-            <div class="section-header">
-                 <h3><i class="fa-solid fa-address-card"></i> My Primary Dealer Details </h3>
-                 </div>
-            <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
-
-            <div id="myDetailsDisplay" style="margin-top: 15px;">
-                <p style="color: #2196f3; text-align: center;">Loading your details...</p>
-                </div>
-        </section>
-
-        <section class="dashboard-card" id="dealerFormCard" style="border-left-color: #ff9800; display: none;">
-            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Set/Edit My Primary Details</h3>
-
-            <form id="detailsForm" class="dealer-details-form">
-                <label for="companyName">Company Name <span style="color:red;">*</span></label>
-                <input type="text" id="companyName" name="companyName" required>
-
-                <label for="contactPerson">Contact Person</label>
-                <input type="text" id="contactPerson" name="contactPerson">
-
-                <label for="phoneNumber">Phone Number <span style="color:red;">*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" required>
-
-                <label for="gstinNumber">GSTIN / Tax ID</label>
-                <input type="text" id="gstinNumber" name="gstinNumber" maxlength="15">
-
-                <label for="address">Address</label>
-                <textarea id="address" name="address" rows="3"></textarea>
-                
-                <div class="message-box" id="formMessage" style="display: none;"></div>
-
-                <div class="form-action-buttons">
-                    <button type="submit" class="save-btn"><i class="fa-solid fa-save"></i> Save Details</button>
-                    <button type="button" class="cancel-btn" onclick="closeDealerForm()"><i class="fa-solid fa-xmark"></i> Cancel</button>
-                </div>
-            </form>
-        </section>
-        <section class="dashboard-card" id="transactionHistory" style="border-left-color: #00bcd4; margin-bottom: 40px;">
-            <h3><i class="fa-solid fa-list-check"></i> Recent Transaction History</h3>
-            <div class="data-table-container">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <input type="text" placeholder="Search by Order ID or Product..." style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                    <select style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
-                        <option value="">Filter by Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                    </select>
-                </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Date</th>
-                                <th>Product</th>
-                                <th>Quantity (MT)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>#JMTS1008</td>
-                            <td>2025-10-01</td>
-                            <td>HB Wire (8G)</td>
-                            <td>10.0</td>
-                            <td><span class="status-badge shipped">Shipped</span></td>
-                        </tr>
-                        <tr>
-                            <td>#JMTS1007</td>
-                            <td>2025-09-28</td>
-                            <td>MS Wire Nails</td>
-                            <td>5.5</td>
-                            <td><span class="status-badge delivered">Delivered</span></td>
-                        </tr>
-                        <tr>
-                            <td>#JMTS1006</td>
-                            <td>2025-09-25</td>
-                            <td>MS Wire (10G)</td>
-                            <td>12.0</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>#JMTS1005</td>
-                            <td>2025-09-20</td>
-                            <td>HB Wire (8G)</td>
-                            <td>8.0</td>
-                            <td><span class="status-badge delivered">Delivered</span></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="text-align: right; margin-top: 15px; font-size: 0.9em; color: #666;">
-                    Showing 1 - 4 of 24 Total Transactions. <a href="#" style="color: #00bcd4; text-decoration: none; font-weight: 700;">View All →</a>
-                </div>
-            </div>
-        </section>
-
 
         <section class="dashboard-card" id="pricing" style="border-left-color: #1a237e; margin-bottom: 40px;">
             <h3><i class="fa-solid fa-tags"></i> Exclusive Partner Pricing (Current Rates)</h3>
@@ -473,174 +193,5 @@
         
     </div>
     
-    <script>
-        // State and DOM elements
-        let currentDealerDetails = {}; // Stores the single record fetched from the server
-        
-        // Get the new display element and existing form elements
-        const myDetailsDisplay = document.getElementById('myDetailsDisplay');
-        const dealerFormCard = document.getElementById('dealerFormCard');
-        const detailsForm = document.getElementById('detailsForm');
-        const formTitle = document.getElementById('formTitle');
-        const formMessage = document.getElementById('formMessage');
-
-        // --- UI UTILITIES ---
-        
-        function showMessage(type, message) {
-            formMessage.textContent = message;
-            formMessage.className = 'message-box ' + type;
-            formMessage.style.display = 'block';
-            setTimeout(() => {
-                formMessage.style.display = 'none';
-            }, 5000);
-        }
-        
-        // --- FUNCTION: Renders the single dealer details record ---
-        function renderMyDetails() {
-            if (Object.keys(currentDealerDetails).length === 0) {
-                // Case: No details found for this user
-                myDetailsDisplay.innerHTML = `
-                    <p style="text-align: center; color: #ff5722; font-style: italic; margin-bottom: 20px;">
-                        Your primary dealer details are not set. Click the button to save them.
-                    </p>
-                    <button 
-                        class="edit-toggle-btn" 
-                        onclick="openDealerForm()" 
-                        style="border-color: #ff9800; color: #ff9800; display: block; margin: 0 auto; padding: 10px 20px;"
-                    >
-                        <i class="fa-solid fa-address-card"></i> Set My Details Now
-                    </button>
-                `;
-            } else {
-                // Case: Details found, display them
-                const d = currentDealerDetails;
-                myDetailsDisplay.innerHTML = `
-                    <div style="overflow-x: auto;">
-                        <table class="data-table" style="margin-bottom: 20px; font-size: 1em;">
-                            <tbody>
-                                <tr><th style="width: 30%; background-color: #f7f7f7;">Company Name</th><td>${d.company_name || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Contact Person</th><td>${d.contact_person || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Phone Number</th><td>${d.phone_number || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">GSTIN / Tax ID</th><td>${d.gstin_number || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Address</th><td>${d.address ? d.address.replace(/\n/g, '<br>') : 'N/A'}</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <button 
-                        class="edit-toggle-btn" 
-                        onclick="openDealerForm()" 
-                        style="border-color: #2196f3; color: #2196f3; display: block; margin-left: auto; padding: 8px 15px;"
-                    >
-                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
-                    </button>
-                `;
-            }
-        }
-
-
-        // --- FUNCTION: Fetches the single dealer details record from Express API ---
-        async function loadDealerDetails() {
-            myDetailsDisplay.innerHTML = '<p style="color: #2196f3; text-align: center;">Loading your details...</p>';
-            try {
-                // Use the Express GET API route
-                const response = await fetch('/api/dealer-details');
-                const data = await response.json();
-                
-                if (response.ok && data.success && data.details) {
-                    currentDealerDetails = data.details;
-                } else {
-                    currentDealerDetails = {}; // Details not set yet or unauthorized
-                }
-                renderMyDetails();
-                
-            } catch (error) {
-                console.error("Error loading dealer details:", error);
-                myDetailsDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f;">Failed to load details due to server error.</p>';
-            }
-        }
-        
-
-        // --- UI & FORM LOGIC (Exposed to Global Scope for HTML onClick) ---
-
-        window.openDealerForm = function() {
-            detailsForm.reset();
-            formMessage.style.display = 'none';
-
-            // Set form title and populate fields based on current state
-            if (Object.keys(currentDealerDetails).length > 0) {
-                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit My Dealer Details`;
-                // Populate the form fields
-                document.getElementById('companyName').value = currentDealerDetails.company_name || '';
-                document.getElementById('contactPerson').value = currentDealerDetails.contact_person || '';
-                document.getElementById('phoneNumber').value = currentDealerDetails.phone_number || '';
-                document.getElementById('gstinNumber').value = currentDealerDetails.gstin_number || '';
-                document.getElementById('address').value = currentDealerDetails.address || '';
-            } else {
-                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Set My Primary Dealer Details`;
-            }
-
-            // Toggle UI visibility
-            document.getElementById('myDetailsCard').style.display = 'none';
-            dealerFormCard.style.display = 'block';
-        }
-        
-        window.closeDealerForm = function() {
-            dealerFormCard.style.display = 'none';
-            document.getElementById('myDetailsCard').style.display = 'block';
-        }
-        
-        // --- FORM SUBMISSION HANDLER ---
-        
-        detailsForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                companyName: document.getElementById('companyName').value.trim(),
-                contactPerson: document.getElementById('contactPerson').value.trim(),
-                phoneNumber: document.getElementById('phoneNumber').value.trim(),
-                gstinNumber: document.getElementById('gstinNumber').value.trim(),
-                address: document.getElementById('address').value.trim(),
-            };
-
-            // Basic client-side validation for required fields
-            if (!formData.companyName || !formData.phoneNumber) {
-                showMessage('error', 'Company Name and Phone Number are required fields.');
-                return;
-            }
-
-            showMessage('loading', 'Saving details...');
-            
-            try {
-                // Use POST to the UPSERT API route
-                const response = await fetch('/api/dealer-details', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage('success', data.message);
-                    // Update local state and trigger a re-render from the saved data
-                    currentDealerDetails = data.details;
-                    renderMyDetails(); 
-                    closeDealerForm();
-                } else {
-                    showMessage('error', data.message || 'Failed to save details. Try again.');
-                }
-                
-            } catch (error) {
-                console.error("Error saving dealer:", error);
-                showMessage('error', `Failed to save details: Server connection error.`);
-            }
-        });
-
-        // Start the application by loading dealer details
-        window.onload = loadDealerDetails;
-        
-    </script>
 </body>
 </html>

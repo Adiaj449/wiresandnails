@@ -1,8 +1,10 @@
-const bcrypt = require('bcryptjs');
-const password = 'saket@999'; // Change this if you want a different password
+const bcrypt = require('bcryptjs'); // Must be 'bcryptjs' to match your server.js
+const saltRounds = 10;
+const password = 'test@123'; // or 'adminpass'
 
-bcrypt.hash(password, 10, (err, hash) => {
+bcrypt.hash(password, saltRounds, function(err, hash) {
     if (err) throw err;
     console.log(`Password: ${password}`);
-    console.log(`New Hash: ${hash}`);
+    console.log(`Hash: ${hash}`);
+    // COPY the generated hash and replace the PLACEHOLDER in the SQL script!
 });

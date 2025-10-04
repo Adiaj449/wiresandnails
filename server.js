@@ -7,27 +7,24 @@ const pgSession = require('connect-pg-simple')(session);
 
 const app = express();
 
-// CRITICAL FIX FOR RAILWAY/PROXY: Trust the proxy headers for secure cookies
+// 🛑 CRITICAL FIX: Trust the Railway proxy to handle HTTPS/secure cookies 🛑
 app.set('trust proxy', 1); 
 
-// 🛑 EJS CONFIGURATION 🛑
-app.set('views', __dirname); 
-app.set('view engine', 'ejs'); 
-
+// Use Railway's dynamic PORT environment variable, fallback to 3000 for local testing
 const port = process.env.PORT || 3000; 
 
 // ==============================================
 // 1. DATABASE CONFIGURATION
 // ==============================================
-// Connects to the PostgreSQL database using environment variables
 const pool = new Pool({
+    // Retrieve credentials from Railway's environment variables
     user: process.env.DB_USER || 'postgres',
     host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
-    database: process.env.DB_NAME || 'railway',
+    database: process.env.DB_NAME || 'railway', 
     password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
     port: process.env.DB_PORT || 52101,
     ssl: {
-        rejectUnauthorized: false // Required for platforms like Railway with self-signed certs
+        rejectUnauthorized: false
     }
 });
 
@@ -35,16 +32,14 @@ const pool = new Pool({
 // 2. MIDDLEWARE SETUP
 // ==============================================
 
-// Serve static files (like CSS, images, client-side JS)
 app.use(express.static(__dirname));
-app.use(express.urlencoded({ extended: true })); // Handle form submissions
-app.use(express.json()); // Handle JSON payloads for API routes
+app.use(express.urlencoded({ extended: true }));
 
-// Session Middleware Configuration
+// Session Middleware Configuration (Includes all security fixes)
 app.use(session({
     store: new pgSession({
         pool: pool,          
-        tableName: 'session' // Must match the table created in your database
+        tableName: 'session' 
     }),
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
     resave: false, 
@@ -52,8 +47,10 @@ app.use(session({
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false // Required for cross-site access in production
+        
+        // Final Security Settings: Must be true in production, paired with SameSite='None'
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false 
     }
 }));
 
@@ -62,39 +59,40 @@ app.use(session({
 // 3. ROUTE HANDLERS
 // ==============================================
 
-// A. LANDING PAGE
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// B. LOGIN ROUTE (POST)
+// B. THE LOGIN POST ROUTE - RETURNS JSON AND FORCES SESSION SAVE
 app.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
+
     if (!username || !password) {
         return res.status(400).json({ success: false, message: 'Missing username or password.' });
     }
+
     try {
         const result = await pool.query(
             'SELECT id, username, password_hash, is_partner FROM users WHERE username = $1', 
             [username]
         );
         const user = result.rows[0];
-        
-        // 1. Check if user exists and if password is correct
+
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials. Please try again.' });
+            return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        // 2. Set session variables
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
         
-        // 3. Save session and redirect
+        // Explicitly save the session
         req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
             }
+            
+            // Send the JSON redirect instruction for the frontend
             return res.json({ 
                 success: true, 
                 redirectUrl: '/partner/dashboard' 
@@ -103,35 +101,17 @@ app.post('/auth/login', async (req, res) => {
 
     } catch (error) {
         console.error('Login database or bcrypt error:', error);
-        return res.status(500).json({ success: false, message: 'An unexpected server error occurred during login.' });
+        return res.status(500).json({ success: false, message: 'An unexpected server error occurred.' });
     }
 });
 
 
-// C. PROTECTED DASHBOARD ROUTE (GET) - EJS RENDER
-app.get('/partner/dashboard', async (req, res) => {
-    // Check if user is logged in AND is a partner
+// C. PROTECTED DASHBOARD ROUTE
+app.get('/partner/dashboard', (req, res) => {
+    // This check should now succeed because the session is being retrieved via trusted proxy.
     if (req.session.userId && req.session.isPartner) {
-        try {
-            // Fetch the username for display in the EJS template
-            const userResult = await pool.query(
-                'SELECT username FROM users WHERE id = $1', 
-                [req.session.userId]
-            );
-            
-            const username = userResult.rows[0] ? userResult.rows[0].username : 'Partner';
-
-            // Render the EJS file and inject the username
-            res.render('partner-dashboard', { 
-                username: username 
-            });
-
-        } catch (error) {
-            console.error('Database fetch error on dashboard load:', error);
-            res.redirect('/');
-        }
+        res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // Not authorized or not logged in
         res.redirect('/');
     }
 });
@@ -146,72 +126,6 @@ app.post('/auth/logout', (req, res) => {
         }
         res.redirect('/');
     });
-});
-
-// E. API Route to FETCH Dealer Details (GET)
-app.get('/api/dealer-details', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-    try {
-        const result = await pool.query(
-            'SELECT company_name, contact_person, phone_number, gstin_number, address FROM dealer_details WHERE user_id = $1',
-            [req.session.userId]
-        );
-        
-        if (result.rows.length > 0) {
-            // Send back the single record
-            res.json({ success: true, details: result.rows[0] });
-        } else {
-            // Success, but no details found (user hasn't set them yet)
-            res.json({ success: false, message: 'No details found.' });
-        }
-    } catch (error) {
-        console.error('Error fetching dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error fetching details.' });
-    }
-});
-
-// F. API Route to SAVE/UPDATE Dealer Details (POST - UPSERT)
-app.post('/api/dealer-details', async (req, res) => {
-    if (!req.session.userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-    
-    // Data validation 
-    const { companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
-
-    if (!companyName || !phoneNumber) {
-        return res.status(400).json({ success: false, message: 'Company Name and Phone Number are required fields.' });
-    }
-
-    try {
-        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature
-        const result = await pool.query(
-            `INSERT INTO dealer_details (user_id, company_name, contact_person, phone_number, gstin_number, address) 
-             VALUES ($1, $2, $3, $4, $5, $6)
-             ON CONFLICT (user_id) DO UPDATE
-             SET company_name = EXCLUDED.company_name,
-                 contact_person = EXCLUDED.contact_person,
-                 phone_number = EXCLUDED.phone_number,
-                 gstin_number = EXCLUDED.gstin_number,
-                 address = EXCLUDED.address,
-                 updated_at = CURRENT_TIMESTAMP
-             RETURNING company_name, contact_person, phone_number, gstin_number, address;`,
-            [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
-        );
-
-        res.json({ 
-            success: true, 
-            message: 'Dealer details saved successfully.',
-            // Return the saved details to update the client-side state immediately
-            details: result.rows[0]
-        });
-        
-    } catch (error) {
-        console.error('Error saving dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error saving details.' });
-    }
 });
 
 
