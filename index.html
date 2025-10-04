@@ -142,7 +142,7 @@
       color: #555;
     }
 
-    /* About Section - STYLISH UPDATE */
+    /* About Section - MODERNIZED COMMITMENT HIGHLIGHTS */
     .about {
       padding: 80px 20px;
       background: #fff;
@@ -166,7 +166,8 @@
     }
 
     .about-text {
-        text-align: left;
+        text-align: center; /* Center the introductory text */
+        max-width: 900px;
     }
 
     .about-text p {
@@ -176,43 +177,52 @@
       margin-bottom: 20px;
     }
 
-    .about-stats {
+    /* New Grid for Commitment Highlights */
+    .commitment-grid {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 30px;
         margin-top: 30px;
     }
 
-    .stat-item {
-        background: #fdf6f6; /* Light red/pink background */
-        border-radius: 15px;
+    .commitment-box {
+        background: #fdf6f6; /* Light background for contrast */
+        border-left: 5px solid #d32f2f; /* Red border accent */
+        border-radius: 8px;
         padding: 25px;
-        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.1);
-        transition: transform 0.3s ease;
+        text-align: left;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .stat-item:hover {
+    .commitment-box:hover {
         transform: translateY(-5px);
         box-shadow: 0 6px 15px rgba(211, 47, 47, 0.2);
     }
 
-    .stat-item i {
-        font-size: 2.5rem;
+    .commitment-box i {
+        font-size: 2rem;
         color: #d32f2f;
         margin-bottom: 10px;
     }
 
-    .stat-item h3 {
-        font-size: 2rem;
+    .commitment-box h3 {
+        font-size: 1.3rem;
         color: #222;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
 
-    .stat-item p {
+    .commitment-box p {
         font-size: 0.95rem;
         color: #777;
+        line-height: 1.6;
         margin: 0;
+    }
+
+    /* Hiding the old stats grid (if it were still present) */
+    .about-stats {
+        display: none;
     }
 
 
@@ -493,35 +503,38 @@
   </section>
 
   <section class="about" id="about">
-    <h2>About Our Commitment</h2>
+    <h2>Our Core Commitment</h2>
     <div class="about-content">
         <div class="about-text">
-            <p>Shree JMTS Wires & Nails is a trusted manufacturer of **HB Wire, MS Wire, and MS Nails** based in Jalna, Maharashtra, India. Our foundation is built on a non-negotiable commitment to **quality, precision, and durability** in every product we manufacture.</p>
-            <p>We leverage modern manufacturing techniques and stringent quality checks to ensure our wire and nail products not only meet but exceed industry standards. We proudly serve the construction, industrial, and fabrication sectors with premium materials, helping to build strong foundations and lasting structures across India.</p>
-            <p>Our dedication to excellence and customer satisfaction drives us to continually innovate and deliver the best-in-class products.</p>
+            <p>Shree JMTS Wires & Nails is built on a foundation of trust and quality in Jalna, Maharashtra. We don't just manufacture wires and nails; we deliver the promise of **strength, precision, and reliability** for every project across the construction and industrial sectors.</p>
         </div>
 
-        <div class="about-stats">
-            <div class="stat-item">
-                <i class="fa-solid fa-industry"></i>
-                <h3>10+</h3>
-                <p>Years of Industry Experience</p>
+        <div class="commitment-grid">
+
+            <div class="commitment-box">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h3>Unwavering Precision</h3>
+                <p>We ensure exact dimensional accuracy and consistent gauge control in every coil and nail, guaranteeing superior performance on your site.</p>
             </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-handshake"></i>
-                <h3>500+</h3>
-                <p>Satisfied Clients</p>
+
+            <div class="commitment-box">
+                <i class="fa-solid fa-recycle"></i>
+                <h3>Sustainable Sourcing</h3>
+                <p>Committed to responsible manufacturing, we use only high-grade, sustainably sourced raw materials for maximum durability and environmental care.</p>
             </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-chart-line"></i>
-                <h3>10K+</h3>
-                <p>Tons of Wire Produced</p>
+
+            <div class="commitment-box">
+                <i class="fa-solid fa-lock"></i>
+                <h3>Guaranteed Durability</h3>
+                <p>Our products undergo rigorous testing to withstand extreme conditions, ensuring lasting strength and minimal maintenance for our customers.</p>
             </div>
-            <div class="stat-item">
-                <i class="fa-solid fa-shield-halved"></i>
-                <h3>ISO Certified</h3>
-                <p>Commitment to Quality</p>
+
+            <div class="commitment-box">
+                <i class="fa-solid fa-award"></i>
+                <h3>Certified Quality</h3>
+                <p>As an ISO-certified manufacturer, we adhere to the highest international quality standards, giving you confidence in your supply chain.</p>
             </div>
+
         </div>
     </div>
   </section>
@@ -556,7 +569,7 @@
 
         <div class="contact-form">
             <h3>Quick Inquiry</h3>
-            <p style="margin-bottom: 25px; color: #777;">Click below to instantly chat with us on WhatsApp for a quick quote or product query.</p>
+            <p style="margin-bottom: 25px; color: #777;">Click below to instantly chat with us on **WhatsApp** for a quick quote or product query.</p>
 
             <a href="https://wa.me/919049068449?text=Hello%20Shree%20JMTS%20Wires,%20I%20am%20interested%20in%20your%20products%20and%20would%20like%20more%20details." target="_blank" class="whatsapp-button">
                 <i class="fa-brands fa-whatsapp"></i> Message Us on WhatsApp
