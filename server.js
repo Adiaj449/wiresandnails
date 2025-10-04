@@ -50,8 +50,13 @@ app.use(session({
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true, // Prevents client-side JS access
-        // Set 'secure: true' ONLY if deployed via HTTPS (i.e., on Railway with NODE_ENV=production)
-        secure: process.env.NODE_ENV === 'production' 
+        
+        // CRITICAL FIXES FOR RAILWAY/HTTPS:
+        // 1. 'secure: true' must be set when NODE_ENV is 'production' (HTTPS required)
+        secure: process.env.NODE_ENV === 'production',
+        
+        // 2. 'sameSite: 'Lax'' is necessary for modern browsers when 'secure' is true
+        sameSite: process.env.NODE_ENV === 'production' ? 'Lax' : false 
     }
 }));
 
@@ -92,7 +97,6 @@ app.post('/auth/login', async (req, res) => {
         req.session.isPartner = user.is_partner;
         
         // 4. CRITICAL FIX: Explicitly save the session to the database 
-        // This ensures the session is available for the next request (/partner/dashboard).
         req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
@@ -120,7 +124,7 @@ app.get('/partner/dashboard', (req, res) => {
         // Serves the partner-dashboard.html file
         res.sendFile(path.join(__dirname, 'partner-dashboard.html'));
     } else {
-        // If not logged in or not authorized, redirect to home (This causes the 302 if session fails)
+        // If not logged in or not authorized, redirect to home
         res.redirect('/');
     }
 });
