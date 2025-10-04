@@ -15,28 +15,46 @@
             background-color: #f4f7f6; /* Lighter background than the hero section */
             padding-top: 0;
         }
+        
+        /* 🎨 HEADER COLOR CHANGE: Now white/light gray background */
         .dashboard-header {
-            background-color: #1a237e; /* Deep Indigo - Primary color */
-            color: white;
+            background-color: #ffffff; /* White background */
+            color: #1a237e; /* Text is Deep Indigo */
             padding: 20px 0;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
             margin-bottom: 40px;
         }
+        .dashboard-header .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        /* 🖼️ LOGO STYLES */
+        .dashboard-header .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .dashboard-header .logo-container img {
+            height: 40px; /* Adjust size as needed */
+            margin-right: 15px;
+        }
         .dashboard-header h1 {
-            color: white;
+            color: #1a237e; /* Keep the indigo color for the main heading */
             margin: 0;
-            font-size: 2.5em;
+            font-size: 1.8em; /* Slightly smaller than the main hero heading */
         }
         .dashboard-header p {
-            margin-top: 5px;
-            font-size: 1.1em;
-            opacity: 0.9;
+            display: none; /* Hiding the subtitle for a cleaner top bar */
         }
+        
         .logout-form {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            /* Position changed from absolute to flow naturally in flex container */
+            margin-left: auto; /* Pushes the button to the far right */
         }
         .logout-form button {
             background-color: #d32f2f;
@@ -101,13 +119,22 @@
 </head>
 <body>
     <header class="dashboard-header">
-        <div class="logout-form">
-            <form action="/auth/logout" method="POST">
-                <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
-            </form>
+        <div class="header-content">
+            <div class="logo-container">
+                <img 
+                    src="/Images/logo_wires.png" 
+                    alt="Shree JMTS Wires & Nails Logo" 
+                    class="logo-wires"
+                >
+                <h1><i class="fa-solid fa-gauge-high"></i> Partner Dashboard</h1>
+            </div>
+            
+            <div class="logout-form">
+                <form action="/auth/logout" method="POST">
+                    <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                </form>
+            </div>
         </div>
-        <h1><i class="fa-solid fa-gauge-high"></i> Partner Dashboard</h1>
-        <p>Welcome back! Access your exclusive resources and real-time data below.</p>
     </header>
 
     <div class="dashboard-content">
