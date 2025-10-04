@@ -6,45 +6,40 @@ const path = require('path');
 const pgSession = require('connect-pg-simple')(session); 
 
 const app = express();
+const port = process.env.PORT || 3000; 
 
 // CRITICAL FIX FOR RAILWAY/PROXY: Trust the proxy headers for secure cookies
 app.set('trust proxy', 1); 
-
-// 🛑 EJS CONFIGURATION 🛑
 app.set('views', __dirname); 
 app.set('view engine', 'ejs'); 
-
-const port = process.env.PORT || 3000; 
 
 // ==============================================
 // 1. DATABASE CONFIGURATION
 // ==============================================
-// Connects to the PostgreSQL database using environment variables
+// Using process.env is highly recommended for credentials
 const pool = new Pool({
     user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
-    database: process.env.DB_NAME || 'railway',
-    password: process.env.DB_PASSWORD || 'jmkmuBNOWoPDclysupNBDtLjLprCNJMM',
-    port: process.env.DB_PORT || 52101,
+    host: process.env.DB_HOST || 'localhost',
+    database: process.env.DB_NAME || 'mydatabase',
+    password: process.env.DB_PASSWORD || 'mypassword',
+    port: process.env.DB_PORT || 5432,
     ssl: {
-        rejectUnauthorized: false // Required for platforms like Railway with self-signed certs
+        rejectUnauthorized: false // Adjust as per your hosting environment (e.g., needed for Railway)
     }
 });
 
 // ==============================================
 // 2. MIDDLEWARE SETUP
 // ==============================================
-
-// Serve static files (like CSS, images, client-side JS)
 app.use(express.static(__dirname));
-app.use(express.urlencoded({ extended: true })); // Handle form submissions
-app.use(express.json()); // Handle JSON payloads for API routes
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Session Middleware Configuration
 app.use(session({
     store: new pgSession({
         pool: pool,          
-        tableName: 'session' // Must match the table created in your database
+        tableName: 'session'
     }),
     secret: process.env.SESSION_SECRET || 'A_VERY_LONG_AND_RANDOM_SESSION_SECRET_KEY', 
     resave: false, 
@@ -52,8 +47,8 @@ app.use(session({
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false // Required for cross-site access in production
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : false
     }
 }));
 
@@ -81,27 +76,21 @@ app.post('/auth/login', async (req, res) => {
         );
         const user = result.rows[0];
         
-        // 1. Check if user exists and if password is correct
         if (!user || !(await bcrypt.compare(password, user.password_hash))) {
             return res.status(401).json({ success: false, message: 'Invalid credentials. Please try again.' });
         }
 
-        // 2. Set session variables
+        // Set session variables, including isAdmin
         req.session.userId = user.id;
         req.session.isPartner = user.is_partner;
-        req.session.isAdmin = user.is_admin; // <-- Stores admin status
+        req.session.isAdmin = user.is_admin;
         
-        // 3. Save session and redirect
         req.session.save(err => {
             if (err) {
                 console.error('Session save error:', err);
                 return res.status(500).json({ success: false, message: 'Server error: Could not establish session.' });
             }
-            // Admins can use the same dashboard link
-            return res.json({ 
-                success: true, 
-                redirectUrl: '/partner/dashboard' 
-            });
+            return res.json({ success: true, redirectUrl: '/partner/dashboard' });
         });
 
     } catch (error) {
@@ -113,7 +102,6 @@ app.post('/auth/login', async (req, res) => {
 
 // C. PROTECTED DASHBOARD ROUTE (GET) - EJS RENDER
 app.get('/partner/dashboard', async (req, res) => {
-    // Allows access if user is a partner OR an admin
     if (req.session.userId && (req.session.isPartner || req.session.isAdmin)) {
         try {
             const userResult = await pool.query(
@@ -123,7 +111,7 @@ app.get('/partner/dashboard', async (req, res) => {
             
             const username = userResult.rows[0] ? userResult.rows[0].username : 'User';
 
-            // Render the EJS file and inject the username and isAdmin status
+            // Pass isAdmin status to the EJS template
             res.render('partner-dashboard', { 
                 username: username,
                 isAdmin: req.session.isAdmin || false
@@ -134,7 +122,6 @@ app.get('/partner/dashboard', async (req, res) => {
             res.redirect('/');
         }
     } else {
-        // Not authorized or not logged in
         res.redirect('/');
     }
 });
@@ -151,15 +138,16 @@ app.post('/auth/logout', (req, res) => {
     });
 });
 
-// E. API Route to FETCH ALL DEALERS (Admin-Only Access)
+// ----------------------------------------------------
+// E. API Route to FETCH ALL DEALERS (ADMIN-ONLY) 
+// ----------------------------------------------------
 app.get('/api/admin/all-dealers', async (req, res) => {
-    // CRITICAL: Check for Admin authorization 
     if (!req.session.userId || !req.session.isAdmin) {
         return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
     }
     
     try {
-        // Fetch ALL records. Joins with 'users' to show which partner owns the dealer.
+        // Fetch ALL records and join with users to get the partner's username
         const result = await pool.query(
             `SELECT
                 dn.id AS dealer_id,
@@ -175,7 +163,7 @@ app.get('/api/admin/all-dealers', async (req, res) => {
              ORDER BY u.username, dn.company_name;`
         );
         
-        // Renames key to 'dealers' for seamless consumption by client JS
+        // Use 'dealers' key for client-side consumption
         res.json({ success: true, dealers: result.rows }); 
         
     } catch (error) {
@@ -183,16 +171,16 @@ app.get('/api/admin/all-dealers', async (req, res) => {
         res.status(500).json({ success: false, message: 'Database error fetching all dealer data.' });
     }
 });
+// ----------------------------------------------------
 
-
-// F. API Route to FETCH DEALERS for the logged-in partner (Standard Partner View)
+// F. API Route to FETCH DEALERS (STANDARD PARTNER)
 app.get('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     try {
         const result = await pool.query(
-            // Only selects records tied to the current user (req.session.userId)
+            // CRITICAL: Filters by the logged-in user's ID
             'SELECT id, company_name, contact_person, phone_number, gstin_number, address FROM dealer_network WHERE user_id = $1 ORDER BY company_name',
             [req.session.userId]
         );
@@ -205,7 +193,7 @@ app.get('/api/dealers', async (req, res) => {
     }
 });
 
-// G. API Route to CREATE or UPDATE a Dealer (POST) - Used by both Admin and Partner
+// G. API Route to CREATE or UPDATE a Dealer (POST)
 app.post('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -219,29 +207,23 @@ app.post('/api/dealers', async (req, res) => {
 
     try {
         if (dealerId) {
-            // EDIT MODE (UPDATE) - CRUCIAL: Must check that the record belongs to the user
+            // EDIT MODE (UPDATE) - MUST check user_id for security
             const updateResult = await pool.query(
                 `UPDATE dealer_network 
-                 SET company_name = $1,
-                     contact_person = $2,
-                     phone_number = $3,
-                     gstin_number = $4,
-                     address = $5,
-                     updated_at = CURRENT_TIMESTAMP
+                 SET company_name = $1, contact_person = $2, phone_number = $3, gstin_number = $4, address = $5, updated_at = CURRENT_TIMESTAMP
                  WHERE id = $6 AND user_id = $7
                  RETURNING id;`,
                 [companyName, contactPerson, phoneNumber, gstinNumber, address, dealerId, req.session.userId]
             );
 
             if (updateResult.rowCount === 0) {
-                 // Even if admin, if the UPDATE is run on this route, we only allow updating owned records
                  return res.status(404).json({ success: false, message: 'Dealer not found or unauthorized to edit.' });
             }
 
             res.json({ success: true, message: 'Dealer updated successfully!' });
 
         } else {
-            // CREATE MODE (INSERT) - New dealer is always associated with the logged-in user
+            // CREATE MODE (INSERT)
             await pool.query(
                 `INSERT INTO dealer_network (user_id, company_name, contact_person, phone_number, gstin_number, address) 
                  VALUES ($1, $2, $3, $4, $5, $6);`,
@@ -263,5 +245,4 @@ app.post('/api/dealers', async (req, res) => {
 // ==============================================
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log(`Node environment: ${process.env.NODE_ENV || 'development'}`);
 });

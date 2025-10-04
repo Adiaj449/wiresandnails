@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partner Dashboard - Shree JMTS Wires</title>
     
-    <link rel="stylesheet" href="/style/style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
@@ -13,19 +12,13 @@
         body { background-color: #f4f7f6; padding-top: 0; font-family: 'Roboto Condensed', sans-serif; }
         .dashboard-header { background-color: #ffffff; color: #1a237e; padding: 20px 0; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 40px; }
         .dashboard-header .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .dashboard-header .logo-container { display: flex; align-items: center; }
-        .dashboard-header .logo-container img { height: 40px; margin-right: 15px; }
         .dashboard-header h1 { color: #1a237e; margin: 0; font-size: 1.8em; font-weight: 700; }
         .user-info { text-align: right; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .user-info .user-id-text { font-size: 0.8em; color: #666; word-break: break-all; max-width: 250px; }
         .logout-form button { background-color: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 700; transition: background-color 0.3s; }
         .logout-form button:hover { background-color: #b71c1c; }
         .dashboard-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px; }
         .dashboard-card { background: white; padding: 25px; border-left: 5px solid #ff9800; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); text-align: left; position: relative; }
         .dashboard-card h3 { color: #1a237e; margin-top: 0; font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .dashboard-card ul { list-style: none; padding: 0; }
-        .dashboard-card ul li { padding: 8px 0; border-bottom: 1px dotted #ddd; font-size: 1em; display: flex; justify-content: space-between; }
         .dealer-details-form { padding: 10px 0; }
         .dealer-details-form label { display: block; margin-top: 10px; font-weight: 700; color: #1a237e; }
         .dealer-details-form input, .dealer-details-form textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
@@ -51,7 +44,6 @@
     <header class="dashboard-header">
         <div class="header-content">
             <div class="logo-container">
-                <img src="/Images/logo_wires.png" alt="Shree JMTS Wires & Nails Logo" class="logo-wires">
                 <h1>Welcome, <%= username %>!</h1>
             </div>
             
@@ -59,7 +51,6 @@
                 <p style="margin: 0; font-weight: 700; color: #1a237e;">
                     Role: <%= isAdmin ? 'Admin' : 'Partner' %>
                 </p>
-                <code id="userIdDisplay" class="user-id-text" title="Your unique ID for data segregation">Authentication Success</code> 
                 <div class="logout-form">
                     <form action="/auth/logout" method="POST">
                         <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
@@ -71,14 +62,6 @@
 
     <div class="dashboard-content">
         
-        <section class="dashboard-grid">
-            <div class="dashboard-card" style="border-left-color: #4caf50;">
-                <h3><i class="fa-solid fa-file-invoice"></i> Pending Orders</h3>
-                <p style="font-size: 2.5em; color: #4caf50; margin: 0;">03</p>
-                <a href="#transactionHistory" class="download-link">View Details <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            </section>
-
         <section class="dashboard-card" id="dealerManagementCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
             <div class="section-header">
                  <h3 id="dealerCardTitle"><i class="fa-solid fa-users-gear"></i> Manage Dealer Network</h3>
@@ -94,7 +77,7 @@
             <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
 
             <div id="dealerListDisplay" style="margin-top: 15px;">
-                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Loading dealers...</p>
+                <p id="loadingMessage" class="message-box loading" style="display: block;">Loading dealers...</p>
             </div>
         </section>
 
@@ -125,11 +108,13 @@
                 </div>
             </form>
         </section>
-        </div>
+        
+    </div>
     
     <script>
         // EJS INJECTION: Set a global variable based on server-side status
         const IS_ADMIN = <%= isAdmin %>; 
+        const CURRENT_USERNAME = '<%= username %>';
 
         // State and DOM elements
         let dealerList = []; 
@@ -167,7 +152,7 @@
             
             // Update the card title with count
             dealerCardTitle.innerHTML = IS_ADMIN
-                ? `<i class="fa-solid fa-users-gear"></i> Master Dealer Network (${dealerList.length} Total)`
+                ? `<i class="fa-solid fa-users-gear"></i> **MASTER** Dealer Network (${dealerList.length} Total)`
                 : `<i class="fa-solid fa-users-gear"></i> Manage Dealer Network (${dealerList.length} Dealers)`;
 
 
@@ -191,6 +176,11 @@
                 const contactPerson = dealer.contact_person || 'N/A';
                 const phoneNumber = dealer.phone_number || 'N/A';
                 const gstinNumber = dealer.gstin_number || 'N/A';
+                
+                // Determine if the current user owns the dealer (to enable editing)
+                // Admin can only edit their own records via this simple UI.
+                const isOwner = !IS_ADMIN || dealer.partner_username === CURRENT_USERNAME;
+                const dealerIdToUse = dealer.id || dealer.dealer_id;
 
                 tableHTML += `
                     <tr>
@@ -200,9 +190,12 @@
                         <td>${phoneNumber}</td>
                         <td>${gstinNumber}</td>
                         <td style="text-align: center;">
-                            <button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealer.id || dealer.dealer_id}')">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
+                            ${isOwner 
+                                ? `<button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealerIdToUse}')">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                   </button>`
+                                : `<span style="color: #ccc;" title="Cannot edit other partner's records in this view"><i class="fa-solid fa-lock"></i></span>`
+                            }
                         </td>
                     </tr>
                 `;
@@ -234,7 +227,6 @@
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
-                    // Both endpoints return data.dealers array
                     dealerList = data.dealers; 
                     renderDealerList();
                 } else {
@@ -255,8 +247,6 @@
             detailsForm.reset();
             formMessage.style.display = 'none';
             
-            // Note: Admin should only edit their OWN dealers using this form,
-            // or you would need a much more complex API to handle global edits.
             editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
             if (editingDealerId) {
@@ -264,16 +254,14 @@
                 const dealer = dealerList.find(d => d.id == editingDealerId || d.dealer_id == editingDealerId);
                 if (!dealer) return; 
                 
-                // If in Admin mode and trying to edit another partner's dealer, prevent the form 
-                // and explain the current form limitation.
-                if (IS_ADMIN && dealer.partner_username && dealer.partner_username !== '<%= username %>') {
-                    alert('As an Admin, this simple form can only edit your own dealer records. To edit another partner\'s record, you must implement a separate, dedicated admin editing panel.');
+                // Security check: Only allow editing if the user is the owner
+                if (IS_ADMIN && dealer.partner_username && dealer.partner_username !== CURRENT_USERNAME) {
+                    alert('Error: You can only edit your own dealer records using this form, even as an Admin.');
                     return; 
                 }
 
                 formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
                 
-                // Populate the form fields (using the original names from the partner-only SELECT)
                 document.getElementById('companyName').value = dealer.company_name || '';
                 document.getElementById('contactPerson').value = dealer.contact_person || '';
                 document.getElementById('phoneNumber').value = dealer.phone_number || '';
@@ -281,11 +269,9 @@
                 document.getElementById('address').value = dealer.address || '';
 
             } else {
-                // ADD MODE
                 formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Add New Dealer`;
             }
 
-            // Toggle UI visibility
             dealerManagementCard.style.display = 'none';
             dealerFormCard.style.display = 'block';
         }
@@ -297,7 +283,6 @@
         }
         
         // --- FORM SUBMISSION HANDLER ---
-        
         detailsForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -318,7 +303,7 @@
             showMessage('loading', 'Saving dealer details...');
             
             try {
-                // Uses the standard POST route, which checks for session user ID
+                // Uses the standard POST route for create/update
                 const response = await fetch('/api/dealers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
