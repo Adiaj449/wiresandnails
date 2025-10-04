@@ -328,19 +328,27 @@
             </div>
         </section>
 
-        <section class="dashboard-card" id="myDetailsCard" style="border-left-color: #ff5722; margin-bottom: 40px;">
+        <section class="dashboard-card" id="dealerManagementCard" style="border-left-color: #8e24aa; margin-bottom: 40px;">
             <div class="section-header">
-                 <h3><i class="fa-solid fa-address-card"></i> My Primary Dealer Details </h3>
-                 </div>
+                 <h3><i class="fa-solid fa-users-gear"></i> Manage Dealer Network </h3>
+                 <button 
+                    class="edit-toggle-btn" 
+                    id="addDealerButton" 
+                    onclick="openDealerForm(null)" 
+                    style="border-color: #4caf50; color: #4caf50;"
+                >
+                    <i class="fa-solid fa-plus"></i> Add New Dealer
+                </button>
+            </div>
             <hr style="margin-top: 10px; border: 0; border-top: 1px solid #eee;">
 
-            <div id="myDetailsDisplay" style="margin-top: 15px;">
-                <p style="color: #2196f3; text-align: center;">Loading your details...</p>
+            <div id="dealerListDisplay" style="margin-top: 15px;">
+                <p id="loadingMessage" style="color: #2196f3; text-align: center;">Loading dealers...</p>
                 </div>
         </section>
 
         <section class="dashboard-card" id="dealerFormCard" style="border-left-color: #ff9800; display: none;">
-            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Set/Edit My Primary Details</h3>
+            <h3 id="formTitle"><i class="fa-solid fa-user-plus"></i> Add New Dealer</h3>
 
             <form id="detailsForm" class="dealer-details-form">
                 <label for="companyName">Company Name <span style="color:red;">*</span></label>
@@ -475,15 +483,17 @@
     
     <script>
         // State and DOM elements
-        let currentDealerDetails = {}; // Stores the single record fetched from the server
-        
-        // Get the new display element and existing form elements
-        const myDetailsDisplay = document.getElementById('myDetailsDisplay');
+        let dealerList = []; // Array to hold all dealers for the current user
+        let editingDealerId = null; // Stores the ID of the dealer being edited (null for creation)
+
+        const dealerListDisplay = document.getElementById('dealerListDisplay');
         const dealerFormCard = document.getElementById('dealerFormCard');
         const detailsForm = document.getElementById('detailsForm');
         const formTitle = document.getElementById('formTitle');
         const formMessage = document.getElementById('formMessage');
-
+        const loadingMessage = document.getElementById('loadingMessage');
+        const dealerManagementCard = document.getElementById('dealerManagementCard'); 
+        
         // --- UI UTILITIES ---
         
         function showMessage(type, message) {
@@ -494,99 +504,121 @@
                 formMessage.style.display = 'none';
             }, 5000);
         }
-        
-        // --- FUNCTION: Renders the single dealer details record ---
-        function renderMyDetails() {
-            if (Object.keys(currentDealerDetails).length === 0) {
-                // Case: No details found for this user
-                myDetailsDisplay.innerHTML = `
-                    <p style="text-align: center; color: #ff5722; font-style: italic; margin-bottom: 20px;">
-                        Your primary dealer details are not set. Click the button to save them.
-                    </p>
-                    <button 
-                        class="edit-toggle-btn" 
-                        onclick="openDealerForm()" 
-                        style="border-color: #ff9800; color: #ff9800; display: block; margin: 0 auto; padding: 10px 20px;"
-                    >
-                        <i class="fa-solid fa-address-card"></i> Set My Details Now
-                    </button>
-                `;
-            } else {
-                // Case: Details found, display them
-                const d = currentDealerDetails;
-                myDetailsDisplay.innerHTML = `
-                    <div style="overflow-x: auto;">
-                        <table class="data-table" style="margin-bottom: 20px; font-size: 1em;">
-                            <tbody>
-                                <tr><th style="width: 30%; background-color: #f7f7f7;">Company Name</th><td>${d.company_name || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Contact Person</th><td>${d.contact_person || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Phone Number</th><td>${d.phone_number || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">GSTIN / Tax ID</th><td>${d.gstin_number || 'N/A'}</td></tr>
-                                <tr><th style="background-color: #f7f7f7;">Address</th><td>${d.address ? d.address.replace(/\n/g, '<br>') : 'N/A'}</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <button 
-                        class="edit-toggle-btn" 
-                        onclick="openDealerForm()" 
-                        style="border-color: #2196f3; color: #2196f3; display: block; margin-left: auto; padding: 8px 15px;"
-                    >
-                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
-                    </button>
-                `;
+
+        // --- RENDERING LIST VIEW ---
+        function renderDealerList() {
+            if (dealerList.length === 0) {
+                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #8e24aa; font-style: italic;">No dealers added yet. Click "Add New Dealer" to begin.</p>';
+                return;
             }
+
+            let tableHTML = `
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Contact Person</th>
+                                <th>Phone</th>
+                                <th>GSTIN</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            dealerList.forEach(dealer => {
+                const companyName = dealer.company_name || 'N/A';
+                const contactPerson = dealer.contact_person || 'N/A';
+                const phoneNumber = dealer.phone_number || 'N/A';
+                const gstinNumber = dealer.gstin_number || 'N/A';
+
+                // Pass the dealer.id to the openDealerForm function for editing
+                tableHTML += `
+                    <tr>
+                        <td>${companyName}</td>
+                        <td>${contactPerson}</td>
+                        <td>${phoneNumber}</td>
+                        <td>${gstinNumber}</td>
+                        <td style="text-align: center;">
+                            <button class="dealer-action-btn" title="Edit Dealer" onclick="window.openDealerForm('${dealer.id}')">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            dealerListDisplay.innerHTML = tableHTML;
         }
+        
+        // --- API CALL: FETCH DEALER LIST ---
+        async function loadDealerNetwork() {
+            loadingMessage.style.display = 'block';
+            dealerListDisplay.innerHTML = ''; // Clear previous content
 
-
-        // --- FUNCTION: Fetches the single dealer details record from Express API ---
-        async function loadDealerDetails() {
-            myDetailsDisplay.innerHTML = '<p style="color: #2196f3; text-align: center;">Loading your details...</p>';
             try {
-                // Use the Express GET API route
-                const response = await fetch('/api/dealer-details');
+                // Use the new multi-record GET API route
+                const response = await fetch('/api/dealers');
                 const data = await response.json();
                 
-                if (response.ok && data.success && data.details) {
-                    currentDealerDetails = data.details;
+                if (response.ok && data.success) {
+                    dealerList = data.dealers; // Load the array of dealers
+                    renderDealerList();
                 } else {
-                    currentDealerDetails = {}; // Details not set yet or unauthorized
+                    dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Failed to load dealer network.</p>';
                 }
-                renderMyDetails();
-                
             } catch (error) {
-                console.error("Error loading dealer details:", error);
-                myDetailsDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f;">Failed to load details due to server error.</p>';
+                console.error("Error fetching dealer network:", error);
+                dealerListDisplay.innerHTML = '<p style="text-align: center; color: #d32f2f; font-weight: 700;">Server connection error while loading dealers.</p>';
+            } finally {
+                loadingMessage.style.display = 'none';
             }
         }
-        
 
-        // --- UI & FORM LOGIC (Exposed to Global Scope for HTML onClick) ---
 
-        window.openDealerForm = function() {
+        // --- UI & FORM LOGIC ---
+
+        window.openDealerForm = function(dealerId = null) {
             detailsForm.reset();
             formMessage.style.display = 'none';
+            
+            // Convert string 'null' from HTML onclick to actual null
+            editingDealerId = (dealerId === 'null' || dealerId === null) ? null : dealerId; 
 
-            // Set form title and populate fields based on current state
-            if (Object.keys(currentDealerDetails).length > 0) {
-                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit My Dealer Details`;
+            if (editingDealerId) {
+                // EDIT MODE
+                const dealer = dealerList.find(d => d.id == editingDealerId);
+                if (!dealer) return; 
+
+                formTitle.innerHTML = `<i class="fa-solid fa-user-pen"></i> Edit Dealer: ${dealer.company_name}`;
+                
                 // Populate the form fields
-                document.getElementById('companyName').value = currentDealerDetails.company_name || '';
-                document.getElementById('contactPerson').value = currentDealerDetails.contact_person || '';
-                document.getElementById('phoneNumber').value = currentDealerDetails.phone_number || '';
-                document.getElementById('gstinNumber').value = currentDealerDetails.gstin_number || '';
-                document.getElementById('address').value = currentDealerDetails.address || '';
+                document.getElementById('companyName').value = dealer.company_name || '';
+                document.getElementById('contactPerson').value = dealer.contact_person || '';
+                document.getElementById('phoneNumber').value = dealer.phone_number || '';
+                document.getElementById('gstinNumber').value = dealer.gstin_number || '';
+                document.getElementById('address').value = dealer.address || '';
+
             } else {
-                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Set My Primary Dealer Details`;
+                // ADD MODE
+                formTitle.innerHTML = `<i class="fa-solid fa-user-plus"></i> Add New Dealer`;
             }
 
             // Toggle UI visibility
-            document.getElementById('myDetailsCard').style.display = 'none';
+            dealerManagementCard.style.display = 'none';
             dealerFormCard.style.display = 'block';
         }
         
         window.closeDealerForm = function() {
+            editingDealerId = null;
             dealerFormCard.style.display = 'none';
-            document.getElementById('myDetailsCard').style.display = 'block';
+            dealerManagementCard.style.display = 'block';
         }
         
         // --- FORM SUBMISSION HANDLER ---
@@ -595,6 +627,7 @@
             e.preventDefault();
             
             const formData = {
+                dealerId: editingDealerId, // Send ID if editing (for the UPDATE query on the server)
                 companyName: document.getElementById('companyName').value.trim(),
                 contactPerson: document.getElementById('contactPerson').value.trim(),
                 phoneNumber: document.getElementById('phoneNumber').value.trim(),
@@ -602,21 +635,19 @@
                 address: document.getElementById('address').value.trim(),
             };
 
-            // Basic client-side validation for required fields
+            // Basic client-side validation
             if (!formData.companyName || !formData.phoneNumber) {
                 showMessage('error', 'Company Name and Phone Number are required fields.');
                 return;
             }
 
-            showMessage('loading', 'Saving details...');
+            showMessage('loading', 'Saving dealer details...');
             
             try {
-                // Use POST to the UPSERT API route
-                const response = await fetch('/api/dealer-details', {
+                // Use POST to the server API route (handles both C and U based on dealerId)
+                const response = await fetch('/api/dealers', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 
@@ -624,22 +655,23 @@
 
                 if (data.success) {
                     showMessage('success', data.message);
-                    // Update local state and trigger a re-render from the saved data
-                    currentDealerDetails = data.details;
-                    renderMyDetails(); 
-                    closeDealerForm();
+                    
+                    // Refresh the entire list from the server to show the update/new entry
+                    await loadDealerNetwork(); 
+                    
+                    closeDealerForm(); 
                 } else {
-                    showMessage('error', data.message || 'Failed to save details. Try again.');
+                    showMessage('error', data.message || 'Failed to save dealer.');
                 }
                 
             } catch (error) {
                 console.error("Error saving dealer:", error);
-                showMessage('error', `Failed to save details: Server connection error.`);
+                showMessage('error', `Failed to save dealer: Server connection error.`);
             }
         });
 
-        // Start the application by loading dealer details
-        window.onload = loadDealerDetails;
+        // Start the application by loading the dealer network list
+        window.onload = loadDealerNetwork;
         
     </script>
 </body>

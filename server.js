@@ -148,69 +148,77 @@ app.post('/auth/logout', (req, res) => {
     });
 });
 
-// E. API Route to FETCH Dealer Details (GET)
-app.get('/api/dealer-details', async (req, res) => {
+// E. API Route to FETCH ALL DEALERS for the logged-in partner (GET)
+// Retrieves a list of dealers associated with the current partner's userId.
+app.get('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     try {
         const result = await pool.query(
-            'SELECT company_name, contact_person, phone_number, gstin_number, address FROM dealer_details WHERE user_id = $1',
+            // NOTE: Using the 'dealer_network' table and selecting all records for this user
+            'SELECT id, company_name, contact_person, phone_number, gstin_number, address FROM dealer_network WHERE user_id = $1 ORDER BY company_name',
             [req.session.userId]
         );
         
-        if (result.rows.length > 0) {
-            // Send back the single record
-            res.json({ success: true, details: result.rows[0] });
-        } else {
-            // Success, but no details found (user hasn't set them yet)
-            res.json({ success: false, message: 'No details found.' });
-        }
+        // Return the full list (or an empty array)
+        res.json({ success: true, dealers: result.rows });
+        
     } catch (error) {
-        console.error('Error fetching dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error fetching details.' });
+        console.error('Error fetching dealer list:', error);
+        res.status(500).json({ success: false, message: 'Database error fetching dealer network.' });
     }
 });
 
-// F. API Route to SAVE/UPDATE Dealer Details (POST - UPSERT)
-app.post('/api/dealer-details', async (req, res) => {
+// F. API Route to CREATE or UPDATE a Dealer (POST)
+app.post('/api/dealers', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     
-    // Data validation 
-    const { companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
+    // dealerId is sent by the client if editing an existing dealer
+    const { dealerId, companyName, contactPerson, phoneNumber, gstinNumber, address } = req.body;
 
     if (!companyName || !phoneNumber) {
         return res.status(400).json({ success: false, message: 'Company Name and Phone Number are required fields.' });
     }
 
     try {
-        // Uses the PostgreSQL ON CONFLICT (UPSERT) feature
-        const result = await pool.query(
-            `INSERT INTO dealer_details (user_id, company_name, contact_person, phone_number, gstin_number, address) 
-             VALUES ($1, $2, $3, $4, $5, $6)
-             ON CONFLICT (user_id) DO UPDATE
-             SET company_name = EXCLUDED.company_name,
-                 contact_person = EXCLUDED.contact_person,
-                 phone_number = EXCLUDED.phone_number,
-                 gstin_number = EXCLUDED.gstin_number,
-                 address = EXCLUDED.address,
-                 updated_at = CURRENT_TIMESTAMP
-             RETURNING company_name, contact_person, phone_number, gstin_number, address;`,
-            [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
-        );
+        if (dealerId) {
+            // EDIT MODE (UPDATE)
+            const updateResult = await pool.query(
+                `UPDATE dealer_network 
+                 SET company_name = $1,
+                     contact_person = $2,
+                     phone_number = $3,
+                     gstin_number = $4,
+                     address = $5,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE id = $6 AND user_id = $7
+                 RETURNING id;`,
+                [companyName, contactPerson, phoneNumber, gstinNumber, address, dealerId, req.session.userId]
+            );
 
-        res.json({ 
-            success: true, 
-            message: 'Dealer details saved successfully.',
-            // Return the saved details to update the client-side state immediately
-            details: result.rows[0]
-        });
+            if (updateResult.rowCount === 0) {
+                 return res.status(404).json({ success: false, message: 'Dealer not found or unauthorized to edit.' });
+            }
+
+            res.json({ success: true, message: 'Dealer updated successfully!' });
+
+        } else {
+            // CREATE MODE (INSERT)
+            await pool.query(
+                `INSERT INTO dealer_network (user_id, company_name, contact_person, phone_number, gstin_number, address) 
+                 VALUES ($1, $2, $3, $4, $5, $6);`,
+                [req.session.userId, companyName, contactPerson, phoneNumber, gstinNumber, address]
+            );
+
+            res.json({ success: true, message: 'New dealer created successfully!' });
+        }
         
     } catch (error) {
-        console.error('Error saving dealer details:', error);
-        res.status(500).json({ success: false, message: 'Database error saving details.' });
+        console.error('Error saving dealer:', error);
+        res.status(500).json({ success: false, message: 'Database error saving dealer.' });
     }
 });
 
