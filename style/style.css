@@ -66,6 +66,125 @@ a:hover {
 background-color: #FFC72C; /* Brighter on hover */
 }
 
+/* ============================================== */
+/* EMBEDDED LOGIN SECTION STYLES (Roboto Condensed) */
+/* ============================================== */
+
+/* The main container for the login form */
+.login-page {
+    /* Set a specific background for the login section to separate it visually */
+    background-color: #1A1A1A; /* Near Black */
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The actual box surrounding the form elements */
+.login-box {
+    background-color: #2c2c2c; /* Slightly lighter dark grey box */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 350px; /* Limits the width of the form for better focus */
+    text-align: center;
+}
+
+/* Heading style */
+.login-heading {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 2em;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+}
+
+/* Subtitle/description text */
+.subtitle {
+    font-family: 'Roboto Condensed', sans-serif;
+    color: #a0a0a0;
+    margin-bottom: 25px;
+    font-size: 1em;
+}
+
+/* Form Grouping */
+.login-form {
+    text-align: left;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+/* Input labels */
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    color: #E6B31E; /* Industrial Gold accent color for labels */
+    font-size: 0.9em;
+}
+
+/* Text and password input fields */
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #383838; /* Darker input background */
+    color: #FFFFFF;
+    font-size: 1em;
+    font-family: 'Roboto Condensed', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Focus state for inputs */
+.input-group input:focus {
+    border-color: #E6B31E;
+    outline: none;
+}
+
+/* Login Button */
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #E6B31E; /* Industrial Gold */
+    color: #1A1A1A; /* Dark text for high contrast */
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #FFC72C; /* Brighter gold on hover */
+}
+
+.login-button i {
+    margin-right: 8px;
+}
+
+/* Links (Forgot Password) */
+.forgot-password {
+    display: block;
+    text-align: right;
+    color: #a0a0a0;
+    text-decoration: none;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: #FFC72C;
+}
+
 #main-logo-override {
     width: 450px !important;  /* Set the exact size you want */
     height: auto !important;  /* Keep the aspect ratio */

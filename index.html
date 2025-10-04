@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="/style/style.css"> 
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  
 </head>
 <body>
 
@@ -35,6 +38,43 @@
     </div>
   </section>
 
+  <section class="login-page" id="partner-login">
+    <div class="login-box">
+      <h2 class="login-heading">Partner Login</h2> 
+      <p class="subtitle">Secure access for registered dealers.</p>
+      
+      <form action="/auth/login" method="POST" class="login-form">
+        
+        <div class="input-group">
+          <label for="username">Username / ID</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            placeholder="Enter your registered ID" 
+            required
+          >
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="••••••••" 
+            required
+          >
+        </div>
+        
+        <button type="submit" class="login-button">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+        </button>
+        
+        <a href="#" class="forgot-password">Forgot Password?</a>
+      </form>
+    </div>
+  </section>
   <section class="products" id="products">
     <h2>Our Products</h2>
     <div class="product-grid">
