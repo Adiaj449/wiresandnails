@@ -11,19 +11,11 @@ color: #333;
 background-color: #fff;
 }
 
-/* In your CSS file (e.g., style.css) */
 .logo-responsive {
     width: 50%;   /* Image will be 50% of its parent's width */
     height: auto; /* Maintain aspect ratio */
 }
 
-/* Or relative to viewport width */
-/*
-.logo-responsive {
-    width: 25vw;  // Image will be 25% of the viewport width
-    height: auto;
-}
-*/
 
 /* Hero Section */
 .hero {
