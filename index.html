@@ -22,9 +22,6 @@
       <source src="/Images/Jmts_video.mov" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-    <button id="openLoginBtn" class="login-trigger-button">
-      <i class="fa-solid fa-user-lock"></i> Partner Login
-    </button>
     <div class="hero-content">
       <img 
           src="/Images/logo_wires.png" 
@@ -37,16 +34,51 @@
       <p> HB Wire Products Manufacturer in Jalna </p>
       
       <p>Manufacturers of High-Quality HB Wire, MS Wire & MS Nails</p>
-      
-      <div class="hero-actions">
-          <a href="#products">Explore Products</a>
-      </div>
+      <a href="#products">Explore Products</a>
     </div>
   </section>
-  
+
+  <section class="login-page" id="partner-login">
+    <div class="login-box">
+      <h2 class="login-heading">Partner Login</h2> 
+      <p class="subtitle">Secure access for registered dealers.</p>
+      
+      <form action="/auth/login" method="POST" class="login-form">
+        
+        <div class="input-group">
+          <label for="username">Username / ID</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            placeholder="Enter your registered ID" 
+            required
+          >
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="••••••••" 
+            required
+          >
+        </div>
+        
+        <button type="submit" class="login-button">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
+        </button>
+        
+        <a href="#" class="forgot-password">Forgot Password?</a>
+      </form>
+    </div>
+  </section>
   <section class="products" id="products">
     <h2>Our Products</h2>
     <div class="product-grid">
+
       <div class="product">
         <div class="product-icon"><i class="fa-solid fa-link"></i></div>
         <h3>HB Wire</h3>
@@ -81,26 +113,31 @@
         </div>
 
         <div class="commitment-grid">
+
             <div class="commitment-box">
                 <i class="fa-solid fa-gauge-high"></i>
                 <h3>Unwavering Precision</h3>
                 <p>We ensure exact dimensional accuracy and consistent gauge control in every coil and nail, guaranteeing superior performance on your site.</p>
             </div>
+
             <div class="commitment-box">
                 <i class="fa-solid fa-recycle"></i>
                 <h3>Sustainable Sourcing</h3>
                 <p>Committed to responsible manufacturing, we use only high-grade, sustainably sourced raw materials for maximum durability and environmental care.</p>
             </div>
+
             <div class="commitment-box">
                 <i class="fa-solid fa-lock"></i>
                 <h3>Guaranteed Durability</h3>
                 <p>Our products undergo rigorous testing to withstand extreme conditions, ensuring lasting strength and minimal maintenance for our customers.</p>
             </div>
+
             <div class="commitment-box">
                 <i class="fa-solid fa-award"></i>
                 <h3>Certified Quality</h3>
                 <p>As an ISO-certified manufacturer, we adhere to the highest international quality standards, giving you confidence in your supply chain.</p>
             </div>
+
         </div>
     </div>
   </section>
@@ -108,24 +145,30 @@
   <section class="contact" id="contact">
     <h2>Connect With Us - Bulk Wire Supplier in Maharashtra</h2>
     <div class="contact-grid">
+
         <div class="contact-info-block">
             <h3>Our Details</h3>
+            
             <div class="contact-detail">
                 <i class="fa-solid fa-map-location-dot"></i>
                 <p><strong>Address:</strong> MIDC Industrial Area, Jalna, Maharashtra, India - 431203</p>
             </div>
+
             <div style="margin-top: 30px;">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15112.983935275815!2d75.86797746592275!3d19.82421453472061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bdaa02641a96575%3A0x15359a35a7203a98!2sJalna%20MIDC%20Industrial%20Area!5e0!3m2!1sen!2sin!4v1699944000000" width="100%" height="250" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
             </div>
+
         </div>
 
         <div class="contact-form">
             <h3>Quick Inquiry</h3>
             <p style="margin-bottom: 25px; color: #777;">Click below to instantly chat with us on **WhatsApp** for a quick quote or product query.</p>
+
             <a href="https://wa.me/919049068449?text=Hello%20Shree%20JMTS%20Wires,%20I%20am%20interested%20in%20your%20products%20and%20would%20like%20more%20details." target="_blank" class="whatsapp-button">
                 <i class="fa-brands fa-whatsapp"></i> Message Us on WhatsApp
             </a>
         </div>
+
     </div>
   </section>
 
@@ -167,68 +210,6 @@
       <p>© 2025 Shree JMTS Wires & Nails | All Rights Reserved</p>
     </div>
   </footer>
-
-  <div id="loginModal" class="modal">
-    <div class="modal-content login-box">
-      <span class="close-btn">&times;</span>
-      
-      <h2 class="login-heading">Partner Login</h2> 
-      <p class="subtitle">Secure access for registered dealers.</p>
-      
-      <form action="/auth/login" method="POST" class="login-form">
-        
-        <div class="input-group">
-          <label for="modal-username">Username / ID</label>
-          <input 
-            type="text" 
-            id="modal-username" 
-            name="username" 
-            placeholder="Enter your registered ID" 
-            required
-          >
-        </div>
-        
-        <div class="input-group">
-          <label for="modal-password">Password</label>
-          <input 
-            type="password" 
-            id="modal-password" 
-            name="password" 
-            placeholder="••••••••" 
-            required
-          >
-        </div>
-        
-        <button type="submit" class="login-button">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> Login
-        </button>
-        
-        <a href="#" class="forgot-password">Forgot Password?</a>
-      </form>
-    </div>
-  </div>
-  <script>
-    var modal = document.getElementById("loginModal");
-    var btn = document.getElementById("openLoginBtn");
-    var span = document.getElementsByClassName("close-btn")[0];
-
-    // Open modal
-    btn.onclick = function() {
-      modal.style.display = "flex";
-    }
-
-    // Close modal via the 'x'
-    span.onclick = function() {
-      modal.style.display = "none";
-    }
-
-    // Close modal when clicking outside the box
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
-  </script>
 
 </body>
 </html>
